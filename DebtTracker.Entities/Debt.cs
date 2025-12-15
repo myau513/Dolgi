@@ -8,14 +8,16 @@ namespace DebtTracker.Entities
         InProgress = 1,
         Completed = 2
     }
-    public class Debt
+    public class Debt : IDomainObject
     {
-        public string Subject { get; set; }          // Предмет
-        public string Description { get; set; }      // Описание
-        public DebtStatus Status { get; set; }       // Статус
-        public DateTime Deadline { get; set; }       // Дедлайн
+        public int Id { get; set; }
+        public string Subject { get; set; }
+        public string Description { get; set; }
+        public DebtStatus Status { get; set; }
+        public DateTime Deadline { get; set; }
 
-        // Можно добавить конструктор для удобства
+        public Debt() { }
+
         public Debt(string subject, string description, DebtStatus status, DateTime deadline)
         {
             Subject = subject;
@@ -23,9 +25,5 @@ namespace DebtTracker.Entities
             Status = status;
             Deadline = deadline;
         }
-
-        // Пустой конструктор для десериализации если понадобится
-        public Debt() { }
-
     }
 }

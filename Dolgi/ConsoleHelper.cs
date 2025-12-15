@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using DebtTracker.Entities;
 
 namespace DebtTracker.ConsoleApp
@@ -8,7 +9,7 @@ namespace DebtTracker.ConsoleApp
     {
         public static void PrintWarning(List<Debt> tomorrowDebts)
         {
-            if (tomorrowDebts.Any())
+            if (tomorrowDebts != null && tomorrowDebts.Any())
             {
                 Console.ForegroundColor = ConsoleColor.Yellow;
                 Console.WriteLine("\n=== ВНИМАНИЕ: Завтра дедлайн! ===");
@@ -24,7 +25,7 @@ namespace DebtTracker.ConsoleApp
 
         public static void PrintDebts(List<Debt> debts, bool withNumbers = true)
         {
-            if (!debts.Any())
+            if (debts == null || !debts.Any())
             {
                 Console.WriteLine("Список долгов пуст.");
                 return;
@@ -52,13 +53,18 @@ namespace DebtTracker.ConsoleApp
 
         private static string GetStatusText(DebtStatus status)
         {
-            return status switch
+
+            switch (status)
             {
-                DebtStatus.NotStarted => "Не начат",
-                DebtStatus.InProgress => "В процессе",
-                DebtStatus.Completed => "Выполнен",
-                _ => "Неизвестно"
-            };
+                case DebtStatus.NotStarted:
+                    return "Не начат";
+                case DebtStatus.InProgress:
+                    return "В процессе";
+                case DebtStatus.Completed:
+                    return "Выполнен";
+                default:
+                    return "Неизвестно";
+            }
         }
 
         public static void PrintStatusOptions()

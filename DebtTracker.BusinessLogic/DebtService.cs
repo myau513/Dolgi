@@ -1,21 +1,42 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using DebtTracker.DataAccessLayer;
 using DebtTracker.Entities;
 
 namespace DebtTracker.BusinessLogic
 {
     public class DebtService
     {
-        private List<Debt> _debts = new List<Debt>();
+        private IRepository<Debt> _repository;
+
+        // Можно переключаться между реализациями
+        public DebtService(bool useDapper = false)
+        {
+            if (useDapper)
+            {
+                _repository = new DapperRepository<Debt>();
+            }
+            else
+            {
+                _repository = new EntityFrameworkRepository<Debt>();
+            }
+        }
 
         // Добавить долг
         public bool AddDebt(Debt debt)
         {
             if (DebtValidator.ValidateDebt(debt))
             {
-                _debts.Add(debt);
-                return true;
+                try
+                {
+                    _repository.Create(debt);
+                    return true;
+                }
+                catch
+                {
+                    return false;
+                }
             }
             return false;
         }
@@ -23,67 +44,69 @@ namespace DebtTracker.BusinessLogic
         // Получить все долги, отсортированные по дедлайну
         public List<Debt> GetAllDebtsSorted()
         {
-            return _debts.OrderBy(d => d.Deadline).ToList();
+            return _repository.GetAll()
+                .OrderBy(d => d.Deadline)
+                .ToList();
         }
 
         // Получить долги с завтрашним дедлайном
         public List<Debt> GetDebtsWithTomorrowDeadline()
         {
             DateTime tomorrow = DateTime.Today.AddDays(1);
-            return _debts
+            return _repository.GetAll()
                 .Where(d => d.Deadline.Date == tomorrow)
                 .OrderBy(d => d.Deadline)
                 .ToList();
         }
 
-        // Удалить долг по индексу в отсортированном списке
-        public bool RemoveDebtBySortedIndex(int index)
+        // Удалить долг по ID
+        public bool RemoveDebtById(int id)
         {
-            var sortedDebts = GetAllDebtsSorted();
-
-            if (index < 0 || index >= sortedDebts.Count)
+            try
+            {
+                _repository.Delete(id);
+                return true;
+            }
+            catch
+            {
                 return false;
-
-            var debtToRemove = sortedDebts[index];
-            return _debts.Remove(debtToRemove);
+            }
         }
 
-        // Получить долг по индексу в отсортированном списке
-        public Debt GetDebtBySortedIndex(int index)
+        // Получить долг по ID
+        public Debt GetDebtById(int id)
         {
-            var sortedDebts = GetAllDebtsSorted();
-
-            if (index < 0 || index >= sortedDebts.Count)
-                return null;
-
-            return sortedDebts[index];
+            return _repository.GetById(id);
         }
 
-        // Обновить долг (заменяем старый на новый)
-        public bool UpdateDebt(Debt oldDebt, Debt newDebt)
+        // Обновить долг
+        public bool UpdateDebt(Debt debt)
         {
-            if (!DebtValidator.ValidateDebt(newDebt))
+            if (!DebtValidator.ValidateDebt(debt))
                 return false;
 
-            int index = _debts.IndexOf(oldDebt);
-            if (index == -1)
+            try
+            {
+                _repository.Update(debt);
+                return true;
+            }
+            catch
+            {
                 return false;
-
-            _debts[index] = newDebt;
-            return true;
+            }
         }
 
         // Получить позицию долга в отсортированном списке
         public int GetSortedPosition(Debt debt)
         {
             var sortedDebts = GetAllDebtsSorted();
-            return sortedDebts.IndexOf(debt);
+            return sortedDebts.FindIndex(d => d.Id == debt.Id);
         }
 
         // Проверить, есть ли долги
         public bool HasDebts()
         {
-            return _debts.Any();
+            return _repository.GetAll().Any();
         }
     }
 }

@@ -46,10 +46,17 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\DebtTracker.DataAccessLayer\DebtTracker.DataAccessLayer.csproj">
+      <Project>{1b3c90f9-4773-43b7-98fe-d09d0dd1eafb}</Project>
+      <Name>DebtTracker.DataAccessLayer</Name>
+    </ProjectReference>
     <ProjectReference Include="..\DebtTracker.Entities\DebtTracker.Entities.csproj">
       <Project>{0b18a819-e6e5-47a1-8cdb-b0f8b598b571}</Project>
       <Name>DebtTracker.Entities</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="app.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
