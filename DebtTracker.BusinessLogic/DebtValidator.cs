@@ -3,34 +3,45 @@ using DebtTracker.Entities;
 
 namespace DebtTracker.BusinessLogic
 {
-    public static class DebtValidator
+    public class DebtValidator : IDebtValidator
     {
-        public static bool ValidateSubject(string subject)
+        public bool ValidateDebt(Debt debt)
+        {
+            return ValidateSubject(debt.Subject) &&
+                   ValidateDescription(debt.Description) &&
+                   ValidateDeadline(debt.Deadline) &&
+                   ValidateStatusEnum(debt.Status);
+        }
+
+        public bool ValidateSubject(string subject)
         {
             return !string.IsNullOrWhiteSpace(subject);
         }
 
-        public static bool ValidateDescription(string description)
+        public bool ValidateDescription(string description)
         {
-            // Описание может быть пустым по ТЗ, проверяем только на null
-            return description != null;
+            return description != null; 
         }
 
-        public static bool ValidateStatus(int statusValue)
-        {
-            return Enum.IsDefined(typeof(DebtStatus), statusValue);
-        }
-
-        public static bool ValidateDeadline(string dateString, out DateTime deadline)
+        // Два варианта валидации дедлайна:
+        public bool ValidateDeadline(string dateString, out DateTime deadline)
         {
             return DateTime.TryParse(dateString, out deadline);
         }
 
-        public static bool ValidateDebt(Debt debt)
+        public bool ValidateDeadline(DateTime deadline)
         {
-            return ValidateSubject(debt.Subject) &&
-                   ValidateDescription(debt.Description) &&
-                   debt.Deadline != DateTime.MinValue;
+            return deadline > DateTime.MinValue && deadline != DateTime.MaxValue;
+        }
+
+        public bool ValidateStatus(int statusValue)
+        {
+            return Enum.IsDefined(typeof(DebtStatus), statusValue);
+        }
+
+        public bool ValidateStatusEnum(DebtStatus status)
+        {
+            return Enum.IsDefined(typeof(DebtStatus), status);
         }
     }
 }

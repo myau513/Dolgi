@@ -6,39 +6,33 @@ using DebtTracker.Entities;
 
 namespace DebtTracker.BusinessLogic
 {
-    public class DebtService
+    public class DebtService : IDebtService
     {
-        private IRepository<Debt> _repository;
+        private readonly IRepository<Debt> _repository;
+        private readonly IDebtValidator _validator;
 
-        // Можно переключаться между реализациями
-        public DebtService(bool useDapper = false)
+        public DebtService(IRepository<Debt> repository, IDebtValidator validator)
         {
-            if (useDapper)
-            {
-                _repository = new DapperRepository<Debt>();
-            }
-            else
-            {
-                _repository = new EntityFrameworkRepository<Debt>();
-            }
+            _repository = repository ?? throw new ArgumentNullException(nameof(repository));
+            _validator = validator ?? throw new ArgumentNullException(nameof(validator));
         }
 
-        // Добавить долг
         public bool AddDebt(Debt debt)
         {
-            if (DebtValidator.ValidateDebt(debt))
+            if (!_validator.ValidateDebt(debt))
+                return false;
+
+            try
             {
-                try
-                {
-                    _repository.Create(debt);
-                    return true;
-                }
-                catch
-                {
-                    return false;
-                }
+                _repository.Create(debt);
+                return true;
             }
-            return false;
+            catch (Exception ex)
+            {
+                // Здесь можно добавить логирование в будущем
+                Console.WriteLine($"Ошибка при создании долга: {ex.Message}");
+                return false;
+            }
         }
 
         // Получить все долги, отсортированные по дедлайну
@@ -60,15 +54,16 @@ namespace DebtTracker.BusinessLogic
         }
 
         // Удалить долг по ID
-        public bool RemoveDebtById(int id)
+        public bool DeleteDebt(int id)
         {
             try
             {
                 _repository.Delete(id);
                 return true;
             }
-            catch
+            catch (Exception ex)
             {
+                Console.WriteLine($"Ошибка при удалении долга: {ex.Message}");
                 return false;
             }
         }
@@ -82,7 +77,7 @@ namespace DebtTracker.BusinessLogic
         // Обновить долг
         public bool UpdateDebt(Debt debt)
         {
-            if (!DebtValidator.ValidateDebt(debt))
+            if (!_validator.ValidateDebt(debt))
                 return false;
 
             try
@@ -90,8 +85,9 @@ namespace DebtTracker.BusinessLogic
                 _repository.Update(debt);
                 return true;
             }
-            catch
+            catch (Exception ex)
             {
+                Console.WriteLine($"Ошибка при обновлении долга: {ex.Message}");
                 return false;
             }
         }

@@ -7,13 +7,12 @@ using DebtTracker.Entities;
 
 namespace DebtTracker.DataAccessLayer
 {
-    public interface IRepository<T> where T : class, IDomainObject
+    public interface IRepository<T> where T : IDomainObject
     {
-        IEnumerable<T> GetAll();        // Получение всех объектов
-        T GetById(int id);              // Получение объекта по id
-        void Create(T item);            // Создание объекта
-        void Update(T item);            // Обновление объекта
-        void Delete(int id);            // Удаление объекта по id
-        void Save();                    // Сохранение изменений
+        void Create(T entity);
+        IEnumerable<T> GetAll();
+        T GetById(int id);
+        void Update(T entity);
+        void Delete(int id);
     }
 }

@@ -1,65 +1,72 @@
-﻿using DebtTracker.BusinessLogic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using Ninject;
+using DebtTracker.BusinessLogic;
 using DebtTracker.DataAccessLayer;
 using DebtTracker.Entities;
-using System;
-using System.Collections.Generic;
+using ConsoleHelper = DebtTracker.ConsoleApp.ConsoleHelper;
 
 namespace DebtTracker.ConsoleApp
 {
     class Program
     {
-
-        private static DebtService _debtService = new DebtService();
+        private static IDebtService _debtService;
 
         static void Main(string[] args)
         {
-            static void TestDatabaseConnection()
+            // 1. Настраиваем DI контейнер
+            IKernel ninjectKernel = new StandardKernel(new SimpleConfigModule());
+
+            // 2. Получаем зависимости через интерфейсы
+            _debtService = ninjectKernel.Get<IDebtService>();
+
+            // 3. Тестируем подключение к БД
+            TestDatabaseConnection(ninjectKernel);
+
+            // 4. Запускаем главное меню
+            RunMainMenu();
+        }
+
+        static void TestDatabaseConnection(IKernel kernel)
+        {
+            try
             {
-                try
+                Console.WriteLine("Testing database connection...");
+
+                // НЕ используем using! Контекст управляется Ninject
+                var context = kernel.Get<DebtContext>();
+
+                var canConnect = context.Database.Exists();
+                if (canConnect)
                 {
-                    Console.WriteLine("Testing database connection...");
-
-                    using (var context = new DebtContext())
-                    {
-                        // Простая проверка
-                        var canConnect = context.Database.Exists();
-                        if (canConnect)
-                        {
-                            Console.WriteLine("✅ Database connection successful!");
-                        }
-                        else
-                        {
-                            Console.WriteLine("❌ Database does not exist or cannot connect");
-                            Console.WriteLine("Creating database...");
-
-                            // Создаём БД если нет
-                            context.Database.CreateIfNotExists();
-                            Console.WriteLine("✅ Database created!");
-                        }
-                    }
+                    Console.WriteLine("✅ Database connection successful!");
                 }
-                catch (Exception ex)
+                else
                 {
-                    Console.WriteLine($"❌ Database error: {ex.Message}");
-                    Console.WriteLine("Make sure:");
-                    Console.WriteLine("1. SQL Server LocalDB is installed");
-                    Console.WriteLine("2. App.config has correct connection string");
-                    Console.WriteLine("3. Database DolgiDb exists");
+                    Console.WriteLine("❌ Database does not exist or cannot connect");
+                    Console.WriteLine("Creating database...");
+
+                    context.Database.CreateIfNotExists();
+                    Console.WriteLine("✅ Database created!");
                 }
             }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"❌ Database error: {ex.Message}");
+                Console.WriteLine("Make sure:");
+                Console.WriteLine("1. SQL Server LocalDB is installed");
+                Console.WriteLine("2. App.config has correct connection string");
+                Console.WriteLine("3. Database DolgiDb exists");
+            }
 
-            // В Main:
-            TestDatabaseConnection();
+            Console.WriteLine("\nНажмите любую клавишу для продолжения...");
+            Console.ReadKey();
+            Console.Clear();
+        }
 
-            Console.WriteLine("Выберите реализацию репозитория:");
-            Console.WriteLine("1. Entity Framework");
-            Console.WriteLine("2. Dapper");
-            Console.Write("Ваш выбор (1-2): ");
-
-            bool useDapper = Console.ReadLine() == "2";
-            _debtService = new DebtService(useDapper);
-
-
+        static void RunMainMenu()
+        {
             bool exit = false;
 
             while (!exit)
@@ -96,25 +103,6 @@ namespace DebtTracker.ConsoleApp
                 }
             }
         }
-        static void TestSqlClient()
-        {
-            try
-            {
-                Console.WriteLine("Testing System.Data.SqlClient...");
-
-                // Используйте полное имя для уверенности
-                var connection = new System.Data.SqlClient.SqlConnection(
-                    @"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=DolgiDb;Integrated Security=True;");
-
-                connection.Open();
-                Console.WriteLine("✅ System.Data.SqlClient connection successful!");
-                connection.Close();
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"❌ Error: {ex.GetType().Name}: {ex.Message}");
-            }
-        }
 
         static void AddDebt()
         {
@@ -132,7 +120,8 @@ namespace DebtTracker.ConsoleApp
                     Console.Write("Дедлайн (формат ГГГГ-ММ-ДД): ");
                     string dateInput = Console.ReadLine();
 
-                    if (DebtValidator.ValidateDeadline(dateInput, out deadline))
+                    // Создаём статический метод для валидации в ConsoleApp
+                    if (TryParseDeadline(dateInput, out deadline))
                         break;
 
                     Console.WriteLine("Ошибка: неверный формат даты. Используйте формат ГГГГ-ММ-ДД");
@@ -144,7 +133,8 @@ namespace DebtTracker.ConsoleApp
                 {
                     int statusValue = ConsoleHelper.ReadInt("Установите статус выполнения (0-2): ", 0, 2);
 
-                    if (DebtValidator.ValidateStatus(statusValue))
+                    // Статическая валидация для консоли
+                    if (IsValidStatus(statusValue))
                     {
                         status = (DebtStatus)statusValue;
                         break;
@@ -152,7 +142,13 @@ namespace DebtTracker.ConsoleApp
                     Console.WriteLine("Ошибка: неверный статус");
                 }
 
-                var newDebt = new Debt(subject, description, status, deadline);
+                var newDebt = new Debt
+                {
+                    Subject = subject,
+                    Description = description,
+                    Status = status,
+                    Deadline = deadline
+                };
 
                 if (_debtService.AddDebt(newDebt))
                 {
@@ -169,6 +165,17 @@ namespace DebtTracker.ConsoleApp
             }
 
             ConsoleHelper.WaitForAnyKey();
+        }
+
+        // Добавляем вспомогательные методы в класс Program
+        private static bool TryParseDeadline(string dateString, out DateTime deadline)
+        {
+            return DateTime.TryParse(dateString, out deadline);
+        }
+
+        private static bool IsValidStatus(int statusValue)
+        {
+            return statusValue >= 0 && statusValue <= 2; // 0, 1, 2
         }
 
         static void ShowAllDebts()
@@ -208,7 +215,7 @@ namespace DebtTracker.ConsoleApp
                 default:
                     Console.WriteLine("Неверный выбор.");
                     ConsoleHelper.WaitForAnyKey();
-                    ShowAllDebts(); // Рекурсивно показываем снова
+                    ShowAllDebts();
                     break;
             }
         }
@@ -222,7 +229,8 @@ namespace DebtTracker.ConsoleApp
             {
                 var debtToDelete = sortedDebts[debtNumber - 1];
 
-                if (_debtService.RemoveDebtById(debtToDelete.Id))
+                // ИСПРАВЛЕНО: используем DeleteDebt вместо RemoveDebtById
+                if (_debtService.DeleteDebt(debtToDelete.Id))
                 {
                     Console.WriteLine($"✅ Долг №{debtNumber} успешно удален!");
                 }
@@ -253,7 +261,7 @@ namespace DebtTracker.ConsoleApp
                 return;
             }
 
-            // Получаем долг из списка (это уже отсортированный список)
+            // Получаем долг из списка
             int oldIndex = debtNumber - 1;
             var debtToModify = sortedDebts[oldIndex];
 
@@ -283,7 +291,7 @@ namespace DebtTracker.ConsoleApp
             // Копируем существующий долг для изменений
             var modifiedDebt = new Debt
             {
-                Id = actualDebt.Id, // ОЧЕНЬ ВАЖНО: сохраняем ID!
+                Id = actualDebt.Id,
                 Subject = actualDebt.Subject,
                 Description = actualDebt.Description,
                 Status = actualDebt.Status,
@@ -308,7 +316,7 @@ namespace DebtTracker.ConsoleApp
                     {
                         int statusValue = ConsoleHelper.ReadInt("Установите новый статус выполнения (0-2): ", 0, 2);
 
-                        if (DebtValidator.ValidateStatus(statusValue))
+                        if (IsValidStatus(statusValue))
                         {
                             modifiedDebt.Status = (DebtStatus)statusValue;
                             break;
@@ -323,7 +331,7 @@ namespace DebtTracker.ConsoleApp
                         Console.Write("Введите новый дедлайн (формат ГГГГ-ММ-ДД): ");
                         string dateInput = Console.ReadLine();
 
-                        if (DebtValidator.ValidateDeadline(dateInput, out DateTime newDeadline))
+                        if (TryParseDeadline(dateInput, out DateTime newDeadline))
                         {
                             modifiedDebt.Deadline = newDeadline;
                             dateChanged = true;
@@ -340,7 +348,7 @@ namespace DebtTracker.ConsoleApp
                     return;
             }
 
-            // Обновляем долг в сервисе (теперь передаем только один объект)
+            // Обновляем долг в сервисе
             if (_debtService.UpdateDebt(modifiedDebt))
             {
                 Console.WriteLine("\n✅ Долг успешно изменен!");
@@ -348,7 +356,6 @@ namespace DebtTracker.ConsoleApp
                 // Если меняли дату, показываем новую позицию
                 if (dateChanged)
                 {
-                    // Получаем обновленный список для определения новой позиции
                     var newSortedDebts = _debtService.GetAllDebtsSorted();
                     int newIndex = newSortedDebts.FindIndex(d => d.Id == modifiedDebt.Id);
 
@@ -365,7 +372,7 @@ namespace DebtTracker.ConsoleApp
             }
 
             ConsoleHelper.WaitForAnyKey();
-            ShowAllDebts(); // Обновленный список
+            ShowAllDebts();
         }
     }
 }
