@@ -1,8 +1,8 @@
-﻿using System;
+﻿using DebtTracker.DataAccessLayer;
+using DebtTracker.Entities;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using DebtTracker.DataAccessLayer;
-using DebtTracker.Entities;
 
 namespace DebtTracker.BusinessLogic
 {
@@ -17,92 +17,145 @@ namespace DebtTracker.BusinessLogic
             _validator = validator ?? throw new ArgumentNullException(nameof(validator));
         }
 
-        public bool AddDebt(Debt debt)
+        public void AddDebt(Debt debt)
         {
             if (!_validator.ValidateDebt(debt))
-                return false;
+                throw new Exceptions.DebtValidationException("Некорректные данные долга");
 
             try
             {
                 _repository.Create(debt);
-                return true;
             }
             catch (Exception ex)
             {
-                // Здесь можно добавить логирование в будущем
-                Console.WriteLine($"Ошибка при создании долга: {ex.Message}");
-                return false;
+                throw new Exceptions.DebtOperationException($"Ошибка при создании долга: {ex.Message}", ex);
             }
         }
 
         // Получить все долги, отсортированные по дедлайну
         public List<Debt> GetAllDebtsSorted()
         {
-            return _repository.GetAll()
-                .OrderBy(d => d.Deadline)
-                .ToList();
+            try
+            {
+                return _repository.GetAll()
+                    .OrderBy(d => d.Deadline)
+                    .ToList();
+            }
+            catch (Exception ex)
+            {
+                throw new Exceptions.DebtOperationException($"Ошибка при получении списка долгов: {ex.Message}", ex);
+            }
         }
 
         // Получить долги с завтрашним дедлайном
         public List<Debt> GetDebtsWithTomorrowDeadline()
         {
-            DateTime tomorrow = DateTime.Today.AddDays(1);
-            return _repository.GetAll()
-                .Where(d => d.Deadline.Date == tomorrow)
-                .OrderBy(d => d.Deadline)
-                .ToList();
+            try
+            {
+                DateTime tomorrow = DateTime.Today.AddDays(1);
+                return _repository.GetAll()
+                    .Where(d => d.Deadline.Date == tomorrow)
+                    .OrderBy(d => d.Deadline)
+                    .ToList();
+            }
+            catch (Exception ex)
+            {
+                throw new Exceptions.DebtOperationException($"Ошибка при получении долгов с завтрашним дедлайном: {ex.Message}", ex);
+            }
         }
 
         // Удалить долг по ID
-        public bool DeleteDebt(int id)
+        public void DeleteDebt(int id)
         {
             try
             {
                 _repository.Delete(id);
-                return true;
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Ошибка при удалении долга: {ex.Message}");
-                return false;
+                throw new Exceptions.DebtOperationException($"Ошибка при удалении долга с ID {id}: {ex.Message}", ex);
             }
         }
 
         // Получить долг по ID
         public Debt GetDebtById(int id)
         {
-            return _repository.GetById(id);
+            try
+            {
+                var debt = _repository.GetById(id);
+
+                if (debt == null)
+                    throw new Exceptions.DebtNotFoundException($"Долг с ID {id} не найден");
+
+                return debt;
+            }
+            catch (Exceptions.DebtNotFoundException)
+            {
+                throw;
+            }
+            catch (Exception ex)
+            {
+                throw new Exceptions.DebtOperationException($"Ошибка при получении долга с ID {id}: {ex.Message}", ex);
+            }
         }
 
         // Обновить долг
-        public bool UpdateDebt(Debt debt)
+        public void UpdateDebt(Debt debt)
         {
             if (!_validator.ValidateDebt(debt))
-                return false;
+                throw new Exceptions.DebtValidationException("Некорректные данные для обновления долга");
 
             try
             {
                 _repository.Update(debt);
-                return true;
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Ошибка при обновлении долга: {ex.Message}");
-                return false;
+                throw new Exceptions.DebtOperationException($"Ошибка при обновлении долга с ID {debt.Id}: {ex.Message}", ex);
             }
         }
 
         // Получить позицию долга в отсортированном списке
         public int GetSortedPosition(Debt debt)
         {
-            var sortedDebts = GetAllDebtsSorted();
-            return sortedDebts.FindIndex(d => d.Id == debt.Id);
+            if (debt == null)
+                throw new ArgumentNullException(nameof(debt), "Долг не может быть null");
+
+            try
+            {
+                var sortedDebts = GetAllDebtsSorted();
+                var position = sortedDebts.FindIndex(d => d.Id == debt.Id);
+
+                if (position == -1)
+                    throw new Exceptions.DebtNotFoundException($"Долг с ID {debt.Id} не найден в отсортированном списке");
+
+                return position;
+            }
+            catch (Exceptions.DebtOperationException)
+            {
+                throw;
+            }
         }
 
         // Проверить, есть ли долги
         public bool HasDebts()
         {
-            return _repository.GetAll().Any();
+            try
+            {
+                return _repository.GetAll().Any();
+            }
+            catch (Exception ex)
+            {
+                throw new Exceptions.DebtOperationException($"Ошибка при проверке наличия долгов: {ex.Message}", ex);
+            }
+        }
+
+        // Опционально: метод для массовой проверки существования долга
+        public void EnsureDebtExists(int id)
+        {
+            var debt = GetDebtById(id);
+            if (debt == null)
+                throw new Exceptions.DebtNotFoundException($"Долг с ID {id} не существует");
         }
     }
 }
