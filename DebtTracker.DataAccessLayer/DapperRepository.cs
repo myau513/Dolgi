@@ -8,15 +8,42 @@ using System.Linq;
 
 namespace DebtTracker.DataAccessLayer
 {
+    /// <summary>
+    /// Реализация репозитория для работы с базой данных с использованием микро-ORM Dapper.
+    /// Реализует интерфейс <see cref="IRepository{T}"/> для обобщенного типа T, который должен наследоваться от IDomainObject.
+    /// </summary>
+    /// <typeparam name="T">Тип сущности, с которой работает репозиторий (должен наследоваться от IDomainObject).</typeparam>
+    /// <remarks>
+    /// Ключевые особенности:
+    /// <list type="bullet">
+    /// <item>Использует Dapper для высокопроизводительного доступа к данным</item>
+    /// <item>Автоматическое управление подключениями через фабрику</item>
+    /// <item>Полная обработка исключений с преобразованием в специализированные исключения DAL</item>
+    /// <item>Поддержка специфичных для долгов операций</item>
+    /// </list>
+    /// </remarks>
     public class DapperRepository<T> : IRepository<T> where T : class, IDomainObject
     {
         private readonly IDbConnectionFactory _connectionFactory;
 
+        /// <summary>
+        /// Инициализирует новый экземпляр DapperRepository с указанной фабрикой подключений.
+        /// </summary>
+        /// <param name="connectionFactory">Фабрика для создания подключений к базе данных.</param>
+        /// <exception cref="ArgumentNullException">Если connectionFactory равен null.</exception>
         public DapperRepository(IDbConnectionFactory connectionFactory)
         {
             _connectionFactory = connectionFactory ?? throw new ArgumentNullException(nameof(connectionFactory));
         }
 
+        /// <summary>
+        /// Создает новую запись в базе данных.
+        /// </summary>
+        /// <param name="item">Объект сущности для создания.</param>
+        /// <exception cref="ArgumentNullException">Если item равен null.</exception>
+        /// <exception cref="UniqueConstraintException">При нарушении ограничения уникальности.</exception>
+        /// <exception cref="ForeignKeyConstraintException">При нарушении ссылочной целостности.</exception>
+        /// <exception cref="DataAccessException">При других ошибках доступа к данным.</exception>
         public void Create(T item)
         {
             if (item == null)
@@ -35,7 +62,6 @@ namespace DebtTracker.DataAccessLayer
                     if (id <= 0)
                         throw new DataAccessException("Не удалось создать запись в базе данных");
 
-                    // Устанавливаем сгенерированный ID
                     var property = typeof(T).GetProperty("Id");
                     if (property != null && property.CanWrite)
                     {
@@ -57,6 +83,11 @@ namespace DebtTracker.DataAccessLayer
             }
         }
 
+        /// <summary>
+        /// Возвращает все записи из таблицы Debts, отсортированные по дате дедлайна.
+        /// </summary>
+        /// <returns>Коллекция всех сущностей из базы данных.</returns>
+        /// <exception cref="DataAccessException">При ошибках доступа к данным.</exception>
         public IEnumerable<T> GetAll()
         {
             try
@@ -72,6 +103,14 @@ namespace DebtTracker.DataAccessLayer
             }
         }
 
+        /// <summary>
+        /// Возвращает сущность по указанному идентификатору.
+        /// </summary>
+        /// <param name="id">Идентификатор искомой сущности.</param>
+        /// <returns>Сущность с указанным идентификатором.</returns>
+        /// <exception cref="ArgumentException">Если id меньше или равен 0.</exception>
+        /// <exception cref="EntityNotFoundException">Если сущность с указанным ID не найдена.</exception>
+        /// <exception cref="DataAccessException">При других ошибках доступа к данным.</exception>
         public T GetById(int id)
         {
             if (id <= 0)
@@ -99,6 +138,15 @@ namespace DebtTracker.DataAccessLayer
             }
         }
 
+        /// <summary>
+        /// Обновляет существующую запись в базе данных.
+        /// </summary>
+        /// <param name="item">Объект сущности с обновленными данными.</param>
+        /// <exception cref="ArgumentNullException">Если item равен null.</exception>
+        /// <exception cref="EntityNotFoundException">Если сущность с указанным ID не найдена.</exception>
+        /// <exception cref="UniqueConstraintException">При нарушении ограничения уникальности.</exception>
+        /// <exception cref="ForeignKeyConstraintException">При нарушении ссылочной целостности.</exception>
+        /// <exception cref="DataAccessException">При других ошибках доступа к данным.</exception>
         public void Update(T item)
         {
             if (item == null)
@@ -139,6 +187,14 @@ namespace DebtTracker.DataAccessLayer
             }
         }
 
+        /// <summary>
+        /// Удаляет запись по указанному идентификатору.
+        /// </summary>
+        /// <param name="id">Идентификатор удаляемой сущности.</param>
+        /// <exception cref="ArgumentException">Если id меньше или равен 0.</exception>
+        /// <exception cref="EntityNotFoundException">Если сущность с указанным ID не найдена.</exception>
+        /// <exception cref="ForeignKeyConstraintException">При нарушении ссылочной целостности (невозможно удалить).</exception>
+        /// <exception cref="DataAccessException">При других ошибках доступа к данным.</exception>
         public void Delete(int id)
         {
             if (id <= 0)
@@ -169,7 +225,11 @@ namespace DebtTracker.DataAccessLayer
             }
         }
 
-        // Дополнительные методы для Debt-specific операций
+        /// <summary>
+        /// Возвращает долги с дедлайном на завтра.
+        /// </summary>
+        /// <returns>Коллекция долгов с завтрашним дедлайном, отсортированная по времени.</returns>
+        /// <exception cref="DataAccessException">При ошибках доступа к данным.</exception>
         public IEnumerable<T> GetDebtsWithDeadlineTomorrow()
         {
             try

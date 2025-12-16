@@ -5,8 +5,16 @@ using DebtTracker.Entities;
 
 namespace DebtTracker.ConsoleApp
 {
+    /// <summary>
+    /// Вспомогательный класс для работы с консольным интерфейсом приложения DebtTracker.
+    /// Содержит методы для отображения данных, форматирования вывода и взаимодействия с пользователем.
+    /// </summary>
     public static class ConsoleHelper
     {
+        /// <summary>
+        /// Отображает предупреждение о долгах с завтрашним дедлайном.
+        /// </summary>
+        /// <param name="tomorrowDebts">Список долгов с дедлайном на завтра.</param>
         public static void PrintWarning(List<Debt> tomorrowDebts)
         {
             if (tomorrowDebts != null && tomorrowDebts.Any())
@@ -23,6 +31,11 @@ namespace DebtTracker.ConsoleApp
             }
         }
 
+        /// <summary>
+        /// Отображает таблицу с долгами в консоли.
+        /// </summary>
+        /// <param name="debts">Список долгов для отображения.</param>
+        /// <param name="withNumbers">Флаг, указывающий нужно ли отображать порядковые номера.</param>
         public static void PrintDebts(List<Debt> debts, bool withNumbers = true)
         {
             if (debts == null || !debts.Any())
@@ -65,6 +78,11 @@ namespace DebtTracker.ConsoleApp
             Console.WriteLine($"\nВсего долгов: {debts.Count}");
         }
 
+        /// <summary>
+        /// Преобразует значение перечисления DebtStatus в текстовое представление на русском языке.
+        /// </summary>
+        /// <param name="status">Статус долга.</param>
+        /// <returns>Текстовое представление статуса.</returns>
         private static string GetStatusText(DebtStatus status)
         {
             switch (status)
@@ -80,6 +98,11 @@ namespace DebtTracker.ConsoleApp
             }
         }
 
+        /// <summary>
+        /// Возвращает цвет консоли, соответствующий статусу долга.
+        /// </summary>
+        /// <param name="status">Статус долга.</param>
+        /// <returns>Цвет консоли для данного статуса.</returns>
         private static ConsoleColor GetStatusColor(DebtStatus status)
         {
             switch (status)
@@ -95,6 +118,9 @@ namespace DebtTracker.ConsoleApp
             }
         }
 
+        /// <summary>
+        /// Отображает доступные варианты статусов выполнения долга.
+        /// </summary>
         public static void PrintStatusOptions()
         {
             Console.WriteLine("Доступные статусы выполнения:");
@@ -111,12 +137,22 @@ namespace DebtTracker.ConsoleApp
             Console.ResetColor();
         }
 
+        /// <summary>
+        /// Ожидает нажатия любой клавиши пользователем.
+        /// </summary>
         public static void WaitForAnyKey()
         {
             Console.WriteLine("\nНажмите любую клавишу чтобы продолжить...");
             Console.ReadKey();
         }
 
+        /// <summary>
+        /// Считывает целое число из консоли с валидацией диапазона.
+        /// </summary>
+        /// <param name="prompt">Приглашение для ввода.</param>
+        /// <param name="minValue">Минимальное допустимое значение.</param>
+        /// <param name="maxValue">Максимальное допустимое значение.</param>
+        /// <returns>Введенное пользователем целое число.</returns>
         public static int ReadInt(string prompt, int minValue = int.MinValue, int maxValue = int.MaxValue)
         {
             int value;
@@ -133,6 +169,12 @@ namespace DebtTracker.ConsoleApp
             }
         }
 
+        /// <summary>
+        /// Считывает строку из консоли с возможностью разрешения пустого ввода.
+        /// </summary>
+        /// <param name="prompt">Приглашение для ввода.</param>
+        /// <param name="allowEmpty">Флаг, разрешающий пустой ввод.</param>
+        /// <returns>Введенная пользователем строка.</returns>
         public static string ReadString(string prompt, bool allowEmpty = false)
         {
             while (true)
@@ -150,24 +192,36 @@ namespace DebtTracker.ConsoleApp
             }
         }
 
+        /// <summary>
+        /// Отображает сообщение об успешном выполнении операции.
+        /// </summary>
+        /// <param name="message">Текст сообщения.</param>
         public static void PrintSuccess(string message)
         {
             Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine($"✅ {message}");
+            Console.WriteLine($"{message}");
             Console.ResetColor();
         }
 
+        /// <summary>
+        /// Отображает сообщение об ошибке.
+        /// </summary>
+        /// <param name="message">Текст сообщения об ошибке.</param>
         public static void PrintError(string message)
         {
             Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine($"❌ {message}");
+            Console.WriteLine($"{message}");
             Console.ResetColor();
         }
 
+        /// <summary>
+        /// Отображает предупреждающее сообщение.
+        /// </summary>
+        /// <param name="message">Текст предупреждения.</param>
         public static void PrintWarning(string message)
         {
             Console.ForegroundColor = ConsoleColor.Yellow;
-            Console.WriteLine($"⚠️ {message}");
+            Console.WriteLine($"{message}");
             Console.ResetColor();
         }
     }

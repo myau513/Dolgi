@@ -1,15 +1,39 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Data;
 
 namespace DebtTracker.DataAccessLayer
 {
-    //интерфейс для конфигурации подключения чтобы не была жестко зашитая строка подключения
+    /// <summary>
+    /// Интерфейс фабрики для создания подключений к базе данных.
+    /// Определяет абстракцию для создания экземпляров <see cref="IDbConnection"/>.
+    /// </summary>
+    /// <remarks>
+    /// Основные преимущества использования фабрики подключений:
+    /// <list type="bullet">
+    /// <item>Устраняет жесткую зависимость от конкретного типа подключения</item>
+    /// <item>Позволяет централизованно управлять конфигурацией подключений</item>
+    /// <item>Упрощает тестирование через использование моков/стабов</item>
+    /// <item>Поддерживает принцип инверсии зависимостей (DIP)</item>
+    /// <item>Предоставляет единую точку для управления пулом подключений</item>
+    /// </list>
+    /// Реализации могут использовать различные источники конфигурации:
+    /// конфигурационные файлы, переменные окружения, хранилища секретов и т.д.
+    /// </remarks>
     public interface IDbConnectionFactory
     {
+        /// <summary>
+        /// Создает и возвращает новое открытое подключение к базе данных.
+        /// </summary>
+        /// <returns>Открытое подключение к базе данных, реализующее интерфейс <see cref="IDbConnection"/>.</returns>
+        /// <exception cref="System.Configuration.ConfigurationErrorsException">
+        /// Если не удалось получить строку подключения из конфигурации.
+        /// </exception>
+        /// <exception cref="System.Data.Common.DbException">
+        /// Если не удалось установить подключение к базе данных.
+        /// </exception>
+        /// <remarks>
+        /// Вызывающая сторона несет ответственность за освобождение ресурсов подключения
+        /// с помощью оператора using или явного вызова Dispose().
+        /// </remarks>
         IDbConnection CreateConnection();
     }
 }
