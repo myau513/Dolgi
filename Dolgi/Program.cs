@@ -5,7 +5,7 @@ using Ninject;
 using DebtTracker.BusinessLogic;
 using DebtTracker.DataAccessLayer;
 using DebtTracker.Entities;
-using ConsoleHelper = DebtTracker.ConsoleApp.ConsoleHelper;
+using DebtTracker.BusinessLogic.Exceptions;
 
 namespace DebtTracker.ConsoleApp
 {
@@ -32,7 +32,7 @@ namespace DebtTracker.ConsoleApp
         {
             try
             {
-                Console.WriteLine("Testing database connection...");
+                Console.WriteLine("Тестирование подключения к базе данных...");
 
                 // НЕ используем using! Контекст управляется Ninject
                 var context = kernel.Get<DebtContext>();
@@ -40,24 +40,24 @@ namespace DebtTracker.ConsoleApp
                 var canConnect = context.Database.Exists();
                 if (canConnect)
                 {
-                    Console.WriteLine("✅ Database connection successful!");
+                    Console.WriteLine("✅ Подключение к базе данных успешно!");
                 }
                 else
                 {
-                    Console.WriteLine("❌ Database does not exist or cannot connect");
-                    Console.WriteLine("Creating database...");
+                    Console.WriteLine("❌ База данных не существует или нет подключения");
+                    Console.WriteLine("Создаем базу данных...");
 
                     context.Database.CreateIfNotExists();
-                    Console.WriteLine("✅ Database created!");
+                    Console.WriteLine("✅ База данных создана!");
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"❌ Database error: {ex.Message}");
-                Console.WriteLine("Make sure:");
-                Console.WriteLine("1. SQL Server LocalDB is installed");
-                Console.WriteLine("2. App.config has correct connection string");
-                Console.WriteLine("3. Database DolgiDb exists");
+                Console.WriteLine($"❌ Ошибка базы данных: {ex.Message}");
+                Console.WriteLine("Убедитесь что:");
+                Console.WriteLine("1. Установлен SQL Server LocalDB");
+                Console.WriteLine("2. В App.config правильная строка подключения");
+                Console.WriteLine("3. База данных DolgiDb существует");
             }
 
             Console.WriteLine("\nНажмите любую клавишу для продолжения...");
@@ -71,35 +71,43 @@ namespace DebtTracker.ConsoleApp
 
             while (!exit)
             {
-                Console.Clear();
-
-                // Показываем предупреждения о завтрашних дедлайнах
-                var tomorrowDebts = _debtService.GetDebtsWithTomorrowDeadline();
-                ConsoleHelper.PrintWarning(tomorrowDebts);
-
-                Console.WriteLine("=== УПРАВЛЕНИЕ ДОЛГАМИ ===");
-                Console.WriteLine("1. Добавить долг");
-                Console.WriteLine("2. Посмотреть все долги (отсортированные по дедлайну)");
-                Console.WriteLine("3. Выход");
-
-                Console.Write("\nВыберите действие: ");
-                string choice = Console.ReadLine();
-
-                switch (choice)
+                try
                 {
-                    case "1":
-                        AddDebt();
-                        break;
-                    case "2":
-                        ShowAllDebts();
-                        break;
-                    case "3":
-                        exit = true;
-                        break;
-                    default:
-                        Console.WriteLine("Неверный выбор. Попробуйте снова.");
-                        ConsoleHelper.WaitForAnyKey();
-                        break;
+                    Console.Clear();
+
+                    // Показываем предупреждения о завтрашних дедлайнах
+                    var tomorrowDebts = _debtService.GetDebtsWithTomorrowDeadline();
+                    ConsoleHelper.PrintWarning(tomorrowDebts);
+
+                    Console.WriteLine("=== УПРАВЛЕНИЕ ДОЛГАМИ ===");
+                    Console.WriteLine("1. Добавить долг");
+                    Console.WriteLine("2. Посмотреть все долги (отсортированные по дедлайну)");
+                    Console.WriteLine("3. Выход");
+
+                    Console.Write("\nВыберите действие: ");
+                    string choice = Console.ReadLine();
+
+                    switch (choice)
+                    {
+                        case "1":
+                            AddDebt();
+                            break;
+                        case "2":
+                            ShowAllDebts();
+                            break;
+                        case "3":
+                            exit = true;
+                            break;
+                        default:
+                            Console.WriteLine("Неверный выбор. Попробуйте снова.");
+                            ConsoleHelper.WaitForAnyKey();
+                            break;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    HandleException(ex);
+                    ConsoleHelper.WaitForAnyKey();
                 }
             }
         }
@@ -120,7 +128,6 @@ namespace DebtTracker.ConsoleApp
                     Console.Write("Дедлайн (формат ГГГГ-ММ-ДД): ");
                     string dateInput = Console.ReadLine();
 
-                    // Создаём статический метод для валидации в ConsoleApp
                     if (TryParseDeadline(dateInput, out deadline))
                         break;
 
@@ -133,7 +140,6 @@ namespace DebtTracker.ConsoleApp
                 {
                     int statusValue = ConsoleHelper.ReadInt("Установите статус выполнения (0-2): ", 0, 2);
 
-                    // Статическая валидация для консоли
                     if (IsValidStatus(statusValue))
                     {
                         status = (DebtStatus)statusValue;
@@ -150,18 +156,45 @@ namespace DebtTracker.ConsoleApp
                     Deadline = deadline
                 };
 
-                if (_debtService.AddDebt(newDebt))
+                Console.WriteLine($"\nОтладка: Создан объект Debt:");
+                Console.WriteLine($"  Subject: {newDebt.Subject}");
+                Console.WriteLine($"  Description: {newDebt.Description}");
+                Console.WriteLine($"  Status: {newDebt.Status}");
+                Console.WriteLine($"  Deadline: {newDebt.Deadline}");
+                Console.WriteLine($"  Id до сохранения: {newDebt.Id}");
+
+                _debtService.AddDebt(newDebt);
+
+                Console.WriteLine($"\n✅ Долг успешно добавлен!");
+                Console.WriteLine($"  Id после сохранения: {newDebt.Id}");
+
+                // Показываем обновленный список
+                Console.WriteLine("\nОбновленный список долгов:");
+                var updatedDebts = _debtService.GetAllDebtsSorted();
+
+                // Отладочная информация о полученных данных
+                Console.WriteLine($"\nОтладка: Получено {updatedDebts.Count} долгов из БД:");
+                foreach (var debt in updatedDebts)
                 {
-                    Console.WriteLine("\n✅ Долг успешно добавлен!");
+                    Console.WriteLine($"  ID: {debt.Id}, Subject: {debt.Subject}, Deadline: {debt.Deadline}");
                 }
-                else
-                {
-                    Console.WriteLine("\n❌ Не удалось добавить долг. Проверьте введенные данные.");
-                }
+
+                ConsoleHelper.PrintDebts(updatedDebts);
+            }
+            catch (DebtValidationException ex)
+            {
+                Console.WriteLine($"\n❌ Ошибка валидации: {ex.Message}");
+                Console.WriteLine("Проверьте введенные данные и попробуйте снова.");
+            }
+            catch (DebtOperationException ex)
+            {
+                Console.WriteLine($"\n❌ Ошибка при добавлении долга: {ex.Message}");
+                Console.WriteLine($"Внутренняя ошибка: {ex.InnerException?.Message}");
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"\n❌ Ошибка при добавлении долга: {ex.Message}");
+                Console.WriteLine($"\n❌ Неизвестная ошибка: {ex.Message}");
+                Console.WriteLine($"Тип ошибки: {ex.GetType().Name}");
             }
 
             ConsoleHelper.WaitForAnyKey();
@@ -182,41 +215,54 @@ namespace DebtTracker.ConsoleApp
         {
             Console.Clear();
 
-            var sortedDebts = _debtService.GetAllDebtsSorted();
-
-            if (!sortedDebts.Any())
+            try
             {
-                Console.WriteLine("Список долгов пуст.");
-                ConsoleHelper.WaitForAnyKey();
-                return;
-            }
+                var sortedDebts = _debtService.GetAllDebtsSorted();
 
-            ConsoleHelper.PrintDebts(sortedDebts);
-
-            Console.WriteLine("\n=== ДОПОЛНИТЕЛЬНЫЕ ДЕЙСТВИЯ ===");
-            Console.WriteLine("1. Удалить долг");
-            Console.WriteLine("2. Изменить долг");
-            Console.WriteLine("3. Вернуться в главное меню");
-
-            Console.Write("\nВыберите действие: ");
-            string choice = Console.ReadLine();
-
-            switch (choice)
-            {
-                case "1":
-                    DeleteDebt(sortedDebts);
-                    break;
-                case "2":
-                    ModifyDebt(sortedDebts);
-                    break;
-                case "3":
-                    // Просто возвращаемся
-                    break;
-                default:
-                    Console.WriteLine("Неверный выбор.");
+                if (!sortedDebts.Any())
+                {
+                    Console.WriteLine("Список долгов пуст.");
                     ConsoleHelper.WaitForAnyKey();
-                    ShowAllDebts();
-                    break;
+                    return;
+                }
+
+                ConsoleHelper.PrintDebts(sortedDebts);
+
+                Console.WriteLine("\n=== ДОПОЛНИТЕЛЬНЫЕ ДЕЙСТВИЯ ===");
+                Console.WriteLine("1. Удалить долг");
+                Console.WriteLine("2. Изменить долг");
+                Console.WriteLine("3. Вернуться в главное меню");
+
+                Console.Write("\nВыберите действие: ");
+                string choice = Console.ReadLine();
+
+                switch (choice)
+                {
+                    case "1":
+                        DeleteDebt(sortedDebts);
+                        break;
+                    case "2":
+                        ModifyDebt(sortedDebts);
+                        break;
+                    case "3":
+                        // Просто возвращаемся
+                        break;
+                    default:
+                        Console.WriteLine("Неверный выбор.");
+                        ConsoleHelper.WaitForAnyKey();
+                        ShowAllDebts();
+                        break;
+                }
+            }
+            catch (DebtOperationException ex)
+            {
+                Console.WriteLine($"\n❌ Ошибка при получении списка долгов: {ex.Message}");
+                ConsoleHelper.WaitForAnyKey();
+            }
+            catch (Exception ex)
+            {
+                HandleException(ex);
+                ConsoleHelper.WaitForAnyKey();
             }
         }
 
@@ -224,24 +270,45 @@ namespace DebtTracker.ConsoleApp
         {
             Console.Write("\nВведите номер долга в таблице выше, который вы хотели бы удалить: ");
 
-            if (int.TryParse(Console.ReadLine(), out int debtNumber) &&
-                debtNumber >= 1 && debtNumber <= sortedDebts.Count)
+            try
             {
-                var debtToDelete = sortedDebts[debtNumber - 1];
-
-                // ИСПРАВЛЕНО: используем DeleteDebt вместо RemoveDebtById
-                if (_debtService.DeleteDebt(debtToDelete.Id))
+                if (int.TryParse(Console.ReadLine(), out int debtNumber) &&
+                    debtNumber >= 1 && debtNumber <= sortedDebts.Count)
                 {
-                    Console.WriteLine($"✅ Долг №{debtNumber} успешно удален!");
+                    var debtToDelete = sortedDebts[debtNumber - 1];
+
+                    Console.Write($"Вы уверены, что хотите удалить долг '{debtToDelete.Subject}'? (д/н): ");
+                    if (Console.ReadLine()?.ToLower() == "д")
+                    {
+                        _debtService.DeleteDebt(debtToDelete.Id);
+                        Console.WriteLine($"✅ Долг №{debtNumber} успешно удален!");
+
+                        // ОБНОВЛЯЕМ данные из БД
+                        var updatedDebts = _debtService.GetAllDebtsSorted();
+                        Console.Clear();
+                        ConsoleHelper.PrintDebts(updatedDebts);
+                    }
+                    else
+                    {
+                        Console.WriteLine("❌ Удаление отменено.");
+                    }
                 }
                 else
                 {
-                    Console.WriteLine("❌ Не удалось удалить долг.");
+                    Console.WriteLine("❌ Неверный номер долга.");
                 }
             }
-            else
+            catch (DebtNotFoundException ex)
             {
-                Console.WriteLine("❌ Неверный номер долга.");
+                Console.WriteLine($"\n❌ Долг не найден: {ex.Message}");
+            }
+            catch (DebtOperationException ex)
+            {
+                Console.WriteLine($"\n❌ Ошибка при удалении: {ex.Message}");
+            }
+            catch (Exception ex)
+            {
+                HandleException(ex);
             }
 
             ConsoleHelper.WaitForAnyKey();
@@ -252,127 +319,128 @@ namespace DebtTracker.ConsoleApp
         {
             Console.Write("\nВведите номер долга в таблице выше, который вы хотели бы изменить: ");
 
-            if (!int.TryParse(Console.ReadLine(), out int debtNumber) ||
-                debtNumber < 1 || debtNumber > sortedDebts.Count)
+            try
             {
-                Console.WriteLine("❌ Неверный номер долга.");
-                ConsoleHelper.WaitForAnyKey();
-                ShowAllDebts();
-                return;
-            }
-
-            // Получаем долг из списка
-            int oldIndex = debtNumber - 1;
-            var debtToModify = sortedDebts[oldIndex];
-
-            // Получаем актуальный долг из БД по ID
-            var actualDebt = _debtService.GetDebtById(debtToModify.Id);
-            if (actualDebt == null)
-            {
-                Console.WriteLine("❌ Долг не найден в базе данных.");
-                ConsoleHelper.WaitForAnyKey();
-                ShowAllDebts();
-                return;
-            }
-
-            Console.Clear();
-            Console.WriteLine("=== ИЗМЕНЕНИЕ ДОЛГА ===");
-            Console.WriteLine($"Изменяем: {actualDebt.Subject} - {actualDebt.Description}\n");
-
-            Console.WriteLine("Что вы хотите изменить?");
-            Console.WriteLine("1. Название предмета");
-            Console.WriteLine("2. Описание");
-            Console.WriteLine("3. Статус выполнения");
-            Console.WriteLine("4. Дедлайн");
-
-            Console.Write("\nВыберите параметр для изменения: ");
-            string choice = Console.ReadLine();
-
-            // Копируем существующий долг для изменений
-            var modifiedDebt = new Debt
-            {
-                Id = actualDebt.Id,
-                Subject = actualDebt.Subject,
-                Description = actualDebt.Description,
-                Status = actualDebt.Status,
-                Deadline = actualDebt.Deadline
-            };
-
-            bool dateChanged = false;
-
-            switch (choice)
-            {
-                case "1":
-                    modifiedDebt.Subject = ConsoleHelper.ReadString("Введите новое название предмета: ");
-                    break;
-
-                case "2":
-                    modifiedDebt.Description = ConsoleHelper.ReadString("Введите новое описание: ", allowEmpty: true);
-                    break;
-
-                case "3":
-                    ConsoleHelper.PrintStatusOptions();
-                    while (true)
-                    {
-                        int statusValue = ConsoleHelper.ReadInt("Установите новый статус выполнения (0-2): ", 0, 2);
-
-                        if (IsValidStatus(statusValue))
-                        {
-                            modifiedDebt.Status = (DebtStatus)statusValue;
-                            break;
-                        }
-                        Console.WriteLine("Ошибка: неверный статус");
-                    }
-                    break;
-
-                case "4":
-                    while (true)
-                    {
-                        Console.Write("Введите новый дедлайн (формат ГГГГ-ММ-ДД): ");
-                        string dateInput = Console.ReadLine();
-
-                        if (TryParseDeadline(dateInput, out DateTime newDeadline))
-                        {
-                            modifiedDebt.Deadline = newDeadline;
-                            dateChanged = true;
-                            break;
-                        }
-                        Console.WriteLine("Ошибка: неверный формат даты. Используйте формат ГГГГ-ММ-ДД");
-                    }
-                    break;
-
-                default:
-                    Console.WriteLine("❌ Неверный выбор.");
+                if (!int.TryParse(Console.ReadLine(), out int debtNumber) ||
+                    debtNumber < 1 || debtNumber > sortedDebts.Count)
+                {
+                    Console.WriteLine("❌ Неверный номер долга.");
                     ConsoleHelper.WaitForAnyKey();
                     ShowAllDebts();
                     return;
-            }
+                }
 
-            // Обновляем долг в сервисе
-            if (_debtService.UpdateDebt(modifiedDebt))
-            {
+                // Получаем долг из списка
+                var debtToModify = sortedDebts[debtNumber - 1];
+
+                // Получаем актуальный долг из БД
+                var existingDebt = _debtService.GetDebtById(debtToModify.Id);
+
+                Console.Clear();
+                Console.WriteLine("=== ИЗМЕНЕНИЕ ДОЛГА ===");
+                Console.WriteLine($"Изменяем: {existingDebt.Subject} - {existingDebt.Description}\n");
+
+                Console.WriteLine("Что вы хотите изменить?");
+                Console.WriteLine("1. Название предмета");
+                Console.WriteLine("2. Описание");
+                Console.WriteLine("3. Статус выполнения");
+                Console.WriteLine("4. Дедлайн");
+
+                Console.Write("\nВыберите параметр для изменения: ");
+                string choice = Console.ReadLine();
+
+                // ИЗМЕНЯЕМ существующий объект, а не создаем новый
+                switch (choice)
+                {
+                    case "1":
+                        existingDebt.Subject = ConsoleHelper.ReadString("Введите новое название предмета: ");
+                        break;
+
+                    case "2":
+                        existingDebt.Description = ConsoleHelper.ReadString("Введите новое описание: ", allowEmpty: true);
+                        break;
+
+                    case "3":
+                        ConsoleHelper.PrintStatusOptions();
+                        while (true)
+                        {
+                            int statusValue = ConsoleHelper.ReadInt("Установите новый статус выполнения (0-2): ", 0, 2);
+
+                            if (IsValidStatus(statusValue))
+                            {
+                                existingDebt.Status = (DebtStatus)statusValue;
+                                break;
+                            }
+                            Console.WriteLine("Ошибка: неверный статус");
+                        }
+                        break;
+
+                    case "4":
+                        while (true)
+                        {
+                            Console.Write("Введите новый дедлайн (формат ГГГГ-ММ-ДД): ");
+                            string dateInput = Console.ReadLine();
+
+                            if (TryParseDeadline(dateInput, out DateTime newDeadline))
+                            {
+                                existingDebt.Deadline = newDeadline;
+                                break;
+                            }
+                            Console.WriteLine("Ошибка: неверный формат даты. Используйте формат ГГГГ-ММ-ДД");
+                        }
+                        break;
+
+                    default:
+                        Console.WriteLine("❌ Неверный выбор.");
+                        ConsoleHelper.WaitForAnyKey();
+                        ShowAllDebts();
+                        return;
+                }
+
+                _debtService.UpdateDebt(existingDebt);
                 Console.WriteLine("\n✅ Долг успешно изменен!");
 
-                // Если меняли дату, показываем новую позицию
-                if (dateChanged)
-                {
-                    var newSortedDebts = _debtService.GetAllDebtsSorted();
-                    int newIndex = newSortedDebts.FindIndex(d => d.Id == modifiedDebt.Id);
-
-                    if (newIndex >= 0)
-                    {
-                        Console.WriteLine($"\n📊 Вы изменили долг под старым номером {debtNumber}");
-                        Console.WriteLine($"   Сейчас в таблице он под номером {newIndex + 1}");
-                    }
-                }
+                // Обновляем таблицу
+                var updatedDebts = _debtService.GetAllDebtsSorted();
+                Console.Clear();
+                ConsoleHelper.PrintDebts(updatedDebts);
             }
-            else
+            catch (DebtValidationException ex)
             {
-                Console.WriteLine("\n❌ Не удалось изменить долг.");
+                Console.WriteLine($"\n❌ Ошибка валидации: {ex.Message}");
+                Console.WriteLine("Проверьте введенные данные и попробуйте снова.");
+            }
+            catch (DebtNotFoundException ex)
+            {
+                Console.WriteLine($"\n❌ Долг не найден: {ex.Message}");
+            }
+            catch (DebtOperationException ex)
+            {
+                Console.WriteLine($"\n❌ Ошибка при изменении: {ex.Message}");
+            }
+            catch (Exception ex)
+            {
+                HandleException(ex);
             }
 
             ConsoleHelper.WaitForAnyKey();
             ShowAllDebts();
+        }
+
+        private static void HandleException(Exception ex)
+        {
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine($"\n⚠️ Произошла ошибка: {ex.Message}");
+            Console.ResetColor();
+
+            // Логирование для отладки (в реальном приложении используйте логгер)
+#if DEBUG
+            Console.WriteLine($"Тип ошибки: {ex.GetType().Name}");
+            if (ex.InnerException != null)
+            {
+                Console.WriteLine($"Внутренняя ошибка: {ex.InnerException.Message}");
+            }
+#endif
         }
     }
 }

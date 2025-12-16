@@ -10,7 +10,7 @@ namespace DebtTracker.BusinessLogic
     public interface IDebtService
     {
         // CREATE
-        bool AddDebt(Debt debt);
+        void AddDebt(Debt debt);
 
         // READ
         List<Debt> GetAllDebtsSorted();
@@ -19,12 +19,15 @@ namespace DebtTracker.BusinessLogic
         bool HasDebts();
 
         // UPDATE
-        bool UpdateDebt(Debt debt);
+        void UpdateDebt(Debt debt);
 
         // DELETE
-        bool DeleteDebt(int id);
+        void DeleteDebt(int id);
 
         // Дополнительные методы
         int GetSortedPosition(Debt debt);
+
+        // Опционально: проверка существования
+        void EnsureDebtExists(int id);
     }
 }

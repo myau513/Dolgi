@@ -1,8 +1,9 @@
-﻿using DebtTracker.DataAccessLayer;
-using DebtTracker.Entities;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using DebtTracker.DataAccessLayer;
+using DebtTracker.Entities;
+using DebtTracker.DataAccessLayer.Exceptions;
 
 namespace DebtTracker.BusinessLogic
 {
@@ -26,13 +27,21 @@ namespace DebtTracker.BusinessLogic
             {
                 _repository.Create(debt);
             }
-            catch (Exception ex)
+            // Используем просто имена классов, так как добавили using
+            catch (EntityNotFoundException ex)
+            {
+                throw new Exceptions.DebtNotFoundException(ex.Message, ex);
+            }
+            catch (DataAccessException ex)
             {
                 throw new Exceptions.DebtOperationException($"Ошибка при создании долга: {ex.Message}", ex);
             }
+            catch (Exception ex)
+            {
+                throw new Exceptions.DebtOperationException($"Неизвестная ошибка при создании долга: {ex.Message}", ex);
+            }
         }
 
-        // Получить все долги, отсортированные по дедлайну
         public List<Debt> GetAllDebtsSorted()
         {
             try
@@ -41,13 +50,16 @@ namespace DebtTracker.BusinessLogic
                     .OrderBy(d => d.Deadline)
                     .ToList();
             }
-            catch (Exception ex)
+            catch (DataAccessException ex)
             {
                 throw new Exceptions.DebtOperationException($"Ошибка при получении списка долгов: {ex.Message}", ex);
             }
+            catch (Exception ex)
+            {
+                throw new Exceptions.DebtOperationException($"Неизвестная ошибка при получении списка долгов: {ex.Message}", ex);
+            }
         }
 
-        // Получить долги с завтрашним дедлайном
         public List<Debt> GetDebtsWithTomorrowDeadline()
         {
             try
@@ -58,26 +70,36 @@ namespace DebtTracker.BusinessLogic
                     .OrderBy(d => d.Deadline)
                     .ToList();
             }
-            catch (Exception ex)
+            catch (DataAccessException ex)
             {
                 throw new Exceptions.DebtOperationException($"Ошибка при получении долгов с завтрашним дедлайном: {ex.Message}", ex);
             }
+            catch (Exception ex)
+            {
+                throw new Exceptions.DebtOperationException($"Неизвестная ошибка при получении долгов с завтрашним дедлайном: {ex.Message}", ex);
+            }
         }
 
-        // Удалить долг по ID
         public void DeleteDebt(int id)
         {
             try
             {
                 _repository.Delete(id);
             }
-            catch (Exception ex)
+            catch (EntityNotFoundException ex)
+            {
+                throw new Exceptions.DebtNotFoundException($"Долг с ID {id} не найден: {ex.Message}", ex);
+            }
+            catch (DataAccessException ex)
             {
                 throw new Exceptions.DebtOperationException($"Ошибка при удалении долга с ID {id}: {ex.Message}", ex);
             }
+            catch (Exception ex)
+            {
+                throw new Exceptions.DebtOperationException($"Неизвестная ошибка при удалении долга: {ex.Message}", ex);
+            }
         }
 
-        // Получить долг по ID
         public Debt GetDebtById(int id)
         {
             try
@@ -89,17 +111,24 @@ namespace DebtTracker.BusinessLogic
 
                 return debt;
             }
+            catch (EntityNotFoundException ex)
+            {
+                throw new Exceptions.DebtNotFoundException(ex.Message, ex);
+            }
+            catch (DataAccessException ex)
+            {
+                throw new Exceptions.DebtOperationException($"Ошибка при получении долга с ID {id}: {ex.Message}", ex);
+            }
             catch (Exceptions.DebtNotFoundException)
             {
                 throw;
             }
             catch (Exception ex)
             {
-                throw new Exceptions.DebtOperationException($"Ошибка при получении долга с ID {id}: {ex.Message}", ex);
+                throw new Exceptions.DebtOperationException($"Неизвестная ошибка при получении долга: {ex.Message}", ex);
             }
         }
 
-        // Обновить долг
         public void UpdateDebt(Debt debt)
         {
             if (!_validator.ValidateDebt(debt))
@@ -109,13 +138,20 @@ namespace DebtTracker.BusinessLogic
             {
                 _repository.Update(debt);
             }
-            catch (Exception ex)
+            catch (EntityNotFoundException ex)
+            {
+                throw new Exceptions.DebtNotFoundException($"Долг с ID {debt.Id} не найден: {ex.Message}", ex);
+            }
+            catch (DataAccessException ex)
             {
                 throw new Exceptions.DebtOperationException($"Ошибка при обновлении долга с ID {debt.Id}: {ex.Message}", ex);
             }
+            catch (Exception ex)
+            {
+                throw new Exceptions.DebtOperationException($"Неизвестная ошибка при обновлении долга: {ex.Message}", ex);
+            }
         }
 
-        // Получить позицию долга в отсортированном списке
         public int GetSortedPosition(Debt debt)
         {
             if (debt == null)
@@ -137,20 +173,22 @@ namespace DebtTracker.BusinessLogic
             }
         }
 
-        // Проверить, есть ли долги
         public bool HasDebts()
         {
             try
             {
                 return _repository.GetAll().Any();
             }
-            catch (Exception ex)
+            catch (DataAccessException ex)
             {
                 throw new Exceptions.DebtOperationException($"Ошибка при проверке наличия долгов: {ex.Message}", ex);
             }
+            catch (Exception ex)
+            {
+                throw new Exceptions.DebtOperationException($"Неизвестная ошибка при проверке наличия долгов: {ex.Message}", ex);
+            }
         }
 
-        // Опционально: метод для массовой проверки существования долга
         public void EnsureDebtExists(int id)
         {
             var debt = GetDebtById(id);

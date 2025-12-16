@@ -181,6 +181,11 @@
     <Compile Include="DapperRepository.cs" />
     <Compile Include="DebtContext.cs" />
     <Compile Include="EntityFrameworkRepository.cs" />
+    <Compile Include="Exceptions\DataAccessException.cs" />
+    <Compile Include="Exceptions\EntityNotFoundException.cs" />
+    <Compile Include="Exceptions\ForeignKeyConstraintException.cs" />
+    <Compile Include="Exceptions\UniqueConstraintException.cs" />
+    <Compile Include="IDbConnectionFactory.cs" />
     <Compile Include="IRepository.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

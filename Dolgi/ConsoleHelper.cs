@@ -17,7 +17,7 @@ namespace DebtTracker.ConsoleApp
 
                 foreach (var debt in tomorrowDebts)
                 {
-                    Console.WriteLine($"• {debt.Subject} - {debt.Description}");
+                    Console.WriteLine($"• {debt.Subject} - {debt.Description} (Дедлайн: {debt.Deadline:yyyy-MM-dd})");
                 }
                 Console.WriteLine();
             }
@@ -31,7 +31,10 @@ namespace DebtTracker.ConsoleApp
                 return;
             }
 
+            Console.ForegroundColor = ConsoleColor.Cyan;
             Console.WriteLine("\n=== СПИСОК ДОЛГОВ ===");
+            Console.ResetColor();
+
             Console.WriteLine("№  | Предмет       | Статус        | Дедлайн    | Описание");
             Console.WriteLine("---|---------------|---------------|------------|-------------------");
 
@@ -39,21 +42,31 @@ namespace DebtTracker.ConsoleApp
             {
                 var debt = debts[i];
                 string statusText = GetStatusText(debt.Status);
+                ConsoleColor statusColor = GetStatusColor(debt.Status);
 
                 if (withNumbers)
                 {
-                    Console.WriteLine($"{i + 1,-2} | {debt.Subject,-13} | {statusText,-13} | {debt.Deadline:yyyy-MM-dd} | {debt.Description}");
+                    Console.Write($"{i + 1,-2} | {debt.Subject,-13} | ");
+                    Console.ForegroundColor = statusColor;
+                    Console.Write($"{statusText,-13}");
+                    Console.ResetColor();
+                    Console.WriteLine($" | {debt.Deadline:yyyy-MM-dd} | {debt.Description}");
                 }
                 else
                 {
-                    Console.WriteLine($"    | {debt.Subject,-13} | {statusText,-13} | {debt.Deadline:yyyy-MM-dd} | {debt.Description}");
+                    Console.Write($"    | {debt.Subject,-13} | ");
+                    Console.ForegroundColor = statusColor;
+                    Console.Write($"{statusText,-13}");
+                    Console.ResetColor();
+                    Console.WriteLine($" | {debt.Deadline:yyyy-MM-dd} | {debt.Description}");
                 }
             }
+
+            Console.WriteLine($"\nВсего долгов: {debts.Count}");
         }
 
         private static string GetStatusText(DebtStatus status)
         {
-
             switch (status)
             {
                 case DebtStatus.NotStarted:
@@ -67,12 +80,35 @@ namespace DebtTracker.ConsoleApp
             }
         }
 
+        private static ConsoleColor GetStatusColor(DebtStatus status)
+        {
+            switch (status)
+            {
+                case DebtStatus.NotStarted:
+                    return ConsoleColor.Red;
+                case DebtStatus.InProgress:
+                    return ConsoleColor.Yellow;
+                case DebtStatus.Completed:
+                    return ConsoleColor.Green;
+                default:
+                    return ConsoleColor.Gray;
+            }
+        }
+
         public static void PrintStatusOptions()
         {
-            Console.WriteLine("Статусы выполнения:");
-            Console.WriteLine("0 – Не начат");
-            Console.WriteLine("1 – В процессе");
+            Console.WriteLine("Доступные статусы выполнения:");
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.Write("0 – Не начат");
+            Console.ResetColor();
+            Console.Write(" | ");
+            Console.ForegroundColor = ConsoleColor.Yellow;
+            Console.Write("1 – В процессе");
+            Console.ResetColor();
+            Console.Write(" | ");
+            Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine("2 – Выполнен");
+            Console.ResetColor();
         }
 
         public static void WaitForAnyKey()
@@ -91,7 +127,9 @@ namespace DebtTracker.ConsoleApp
                 {
                     return value;
                 }
+                Console.ForegroundColor = ConsoleColor.Red;
                 Console.WriteLine($"Ошибка: введите число от {minValue} до {maxValue}");
+                Console.ResetColor();
             }
         }
 
@@ -106,8 +144,31 @@ namespace DebtTracker.ConsoleApp
                 {
                     return input;
                 }
+                Console.ForegroundColor = ConsoleColor.Red;
                 Console.WriteLine("Ошибка: поле не может быть пустым");
+                Console.ResetColor();
             }
+        }
+
+        public static void PrintSuccess(string message)
+        {
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine($"✅ {message}");
+            Console.ResetColor();
+        }
+
+        public static void PrintError(string message)
+        {
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine($"❌ {message}");
+            Console.ResetColor();
+        }
+
+        public static void PrintWarning(string message)
+        {
+            Console.ForegroundColor = ConsoleColor.Yellow;
+            Console.WriteLine($"⚠️ {message}");
+            Console.ResetColor();
         }
     }
 }

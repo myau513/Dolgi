@@ -57,6 +57,10 @@
   <ItemGroup>
     <Compile Include="DebtService.cs" />
     <Compile Include="DebtValidator.cs" />
+    <Compile Include="Exceptions\BusinessLogicException.cs" />
+    <Compile Include="Exceptions\DebtNotFoundException.cs" />
+    <Compile Include="Exceptions\DebtOperationException.cs" />
+    <Compile Include="Exceptions\DebtValidationException.cs" />
     <Compile Include="IDebtService.cs" />
     <Compile Include="IDebtValidator.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
