@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DebtTracker.BusinessLogic",
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DebtTracker.DataAccessLayer", "DebtTracker.DataAccessLayer\DebtTracker.DataAccessLayer.csproj", "{1B3C90F9-4773-43B7-98FE-D09D0DD1EAFB}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DebtTracker.WUI", "DebtTracker.WUI\DebtTracker.WUI.csproj", "{2202E3C8-132F-431F-B453-D60B0D8FA29D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +35,10 @@ Global
 		{1B3C90F9-4773-43B7-98FE-D09D0DD1EAFB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1B3C90F9-4773-43B7-98FE-D09D0DD1EAFB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1B3C90F9-4773-43B7-98FE-D09D0DD1EAFB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2202E3C8-132F-431F-B453-D60B0D8FA29D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2202E3C8-132F-431F-B453-D60B0D8FA29D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2202E3C8-132F-431F-B453-D60B0D8FA29D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2202E3C8-132F-431F-B453-D60B0D8FA29D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -17,22 +17,17 @@ namespace DebtTracker.BusinessLogic
         /// </summary>
         public override void Load()
         {
-            // 1. Регистрация контекста базы данных Entity Framework
-            // DebtContext регистрируется как синглтон для всего приложения
-            Bind<DebtContext>().ToSelf().InSingletonScope();
+            // ИЗМЕНЕНИЕ 1: DebtContext должен быть Transient или ThreadScope
+            Bind<DebtContext>().ToSelf().InTransientScope(); // ИЛИ .InScope(ctx => StandardScopeCallbacks.Thread(ctx));
 
-            // 2. Связывание абстракции DbContext с конкретной реализацией DebtContext
-            // Когда требуется DbContext, возвращается экземпляр DebtContext
-            Bind<DbContext>().ToMethod(ctx => ctx.Kernel.Get<DebtContext>()).InSingletonScope();
+            // ИЗМЕНЕНИЕ 2: DbContext тоже Transient
+            Bind<DbContext>().ToMethod(ctx => ctx.Kernel.Get<DebtContext>()).InTransientScope();
 
-            // 3. Регистрация репозитория для работы с долгами
-            // Используется EntityFrameworkRepository с синглтон скоупом
-            Bind<IRepository<Debt>>().To<EntityFrameworkRepository<Debt>>().InSingletonScope();
+            // ИЗМЕНЕНИЕ 3: Репозиторий тоже должен быть Transient
+            Bind<IRepository<Debt>>().To<EntityFrameworkRepository<Debt>>().InTransientScope();
 
-            // 4. Регистрация сервисов бизнес-логики
-            // DebtService - transient (новый экземпляр для каждого запроса)
+            // Сервисы оставляем как есть
             Bind<IDebtService>().To<DebtService>().InTransientScope();
-            // DebtValidator - синглтон (не имеет состояния, можно переиспользовать)
             Bind<IDebtValidator>().To<DebtValidator>().InSingletonScope();
         }
     }

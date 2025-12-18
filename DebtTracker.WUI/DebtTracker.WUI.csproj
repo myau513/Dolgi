@@ -1,0 +1,22 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <UseWindowsForms>true</UseWindowsForms>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="EntityFramework" Version="6.5.1" />
+    <PackageReference Include="Ninject" Version="3.3.6" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\DebtTracker.BusinessLogic\DebtTracker.BusinessLogic.csproj" />
+    <ProjectReference Include="..\DebtTracker.DataAccessLayer\DebtTracker.DataAccessLayer.csproj" />
+    <ProjectReference Include="..\DebtTracker.Entities\DebtTracker.Entities.csproj" />
+  </ItemGroup>
+
+</Project>
