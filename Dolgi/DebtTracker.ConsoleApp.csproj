@@ -10,6 +10,7 @@
 	<ItemGroup>
 		<ProjectReference Include="..\DebtTracker.BusinessLogic\DebtTracker.BusinessLogic.csproj" />
 		<ProjectReference Include="..\DebtTracker.Entities\DebtTracker.Entities.csproj" />
+		<ProjectReference Include="..\Presenter\Presenter.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>

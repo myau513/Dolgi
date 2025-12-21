@@ -12,23 +12,32 @@ namespace DebtTracker.BusinessLogic
     /// </summary>
     public class SimpleConfigModule : NinjectModule
     {
-        /// <summary>
-        /// Загружает конфигурацию связей (bindings) для DI-контейнера Ninject.
-        /// </summary>
         public override void Load()
         {
-            // ИЗМЕНЕНИЕ 1: DebtContext должен быть Transient или ThreadScope
-            Bind<DebtContext>().ToSelf().InTransientScope(); // ИЛИ .InScope(ctx => StandardScopeCallbacks.Thread(ctx));
+            // DbContext — transient (ПРАВИЛЬНО)
+            Bind<DebtContext>().ToSelf().InTransientScope();
+            Bind<DbContext>()
+                .ToMethod(ctx => ctx.Kernel.Get<DebtContext>())
+                .InTransientScope();
 
-            // ИЗМЕНЕНИЕ 2: DbContext тоже Transient
-            Bind<DbContext>().ToMethod(ctx => ctx.Kernel.Get<DebtContext>()).InTransientScope();
+            // Репозиторий — transient
+            Bind<IRepository<Debt>>()
+                .To<EntityFrameworkRepository<Debt>>()
+                .InTransientScope();
 
-            // ИЗМЕНЕНИЕ 3: Репозиторий тоже должен быть Transient
-            Bind<IRepository<Debt>>().To<EntityFrameworkRepository<Debt>>().InTransientScope();
+            // Бизнес-логика
+            Bind<IDebtService>()
+                .To<DebtService>()
+                .InTransientScope();
 
-            // Сервисы оставляем как есть
-            Bind<IDebtService>().To<DebtService>().InTransientScope();
-            Bind<IDebtValidator>().To<DebtValidator>().InSingletonScope();
+            Bind<IDebtValidator>()
+                .To<DebtValidator>()
+                .InSingletonScope();
+
+            Bind<IDebtModel>()
+                .To<DebtModel>()
+                .InSingletonScope();
         }
+
     }
 }

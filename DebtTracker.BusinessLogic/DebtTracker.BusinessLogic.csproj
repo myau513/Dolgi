@@ -55,12 +55,14 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DebtModel.cs" />
     <Compile Include="DebtService.cs" />
     <Compile Include="DebtValidator.cs" />
     <Compile Include="Exceptions\BusinessLogicException.cs" />
     <Compile Include="Exceptions\DebtNotFoundException.cs" />
     <Compile Include="Exceptions\DebtOperationException.cs" />
     <Compile Include="Exceptions\DebtValidationException.cs" />
+    <Compile Include="IDebtModel.cs" />
     <Compile Include="IDebtService.cs" />
     <Compile Include="IDebtValidator.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -74,6 +76,10 @@
     <ProjectReference Include="..\DebtTracker.Entities\DebtTracker.Entities.csproj">
       <Project>{0b18a819-e6e5-47a1-8cdb-b0f8b598b571}</Project>
       <Name>DebtTracker.Entities</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\DebtTracker._Shared\DebtTracker._Shared.csproj">
+      <Project>{98f485ee-b831-4189-9b12-9d288df5b542}</Project>
+      <Name>DebtTracker._Shared</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

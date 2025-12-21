@@ -60,7 +60,6 @@
             panel1.Name = "panel1";
             panel1.Size = new Size(788, 75);
             panel1.TabIndex = 1;
-            panel1.Paint += panel1_Paint;
             // 
             // titleLabel
             // 
@@ -83,7 +82,6 @@
             addButton.TabIndex = 0;
             addButton.Text = "Добавить";
             addButton.UseVisualStyleBackColor = true;
-            addButton.Click += addButton_Click;
             // 
             // editButton
             // 
@@ -95,7 +93,6 @@
             editButton.TabIndex = 1;
             editButton.Text = "Изменить";
             editButton.UseVisualStyleBackColor = true;
-            editButton.Click += editButton_Click;
             // 
             // deleteButton
             // 
@@ -107,7 +104,6 @@
             deleteButton.TabIndex = 2;
             deleteButton.Text = "Удалить";
             deleteButton.UseVisualStyleBackColor = true;
-            deleteButton.Click += deleteButton_Click;
             // 
             // refreshButton
             // 
@@ -119,7 +115,6 @@
             refreshButton.TabIndex = 3;
             refreshButton.Text = "Обновить";
             refreshButton.UseVisualStyleBackColor = true;
-            refreshButton.Click += refreshButton_Click;
             // 
             // MainForm
             // 
@@ -133,7 +128,6 @@
             Name = "MainForm";
             StartPosition = FormStartPosition.CenterScreen;
             Text = "Debt Tracker";
-            FormClosing += MainForm_FormClosing;
             Load += MainForm_Load;
             ((System.ComponentModel.ISupportInitialize)debtsDataGridView).EndInit();
             panel1.ResumeLayout(false);

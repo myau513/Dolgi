@@ -1,21 +1,27 @@
-﻿using System;
-using System.Windows.Forms;
+﻿using DebtTracker._Shared;
 using DebtTracker.BusinessLogic;
 using DebtTracker.BusinessLogic.Exceptions;
 using DebtTracker.Entities;
+using System;
+using System.Windows.Forms;
 
 namespace DebtTracker.WUI
 {
-    public partial class AddDebtForm : Form
+    public partial class AddDebtForm : Form, IAddDebtView
     {
-        private readonly IDebtService _debtService;
+        public event Action SaveRequested;
+        public event Action CancelRequested;
 
-        public event EventHandler DebtAdded;
+        public string Subject => subjectTextBox.Text.Trim();
+        public string Description => descriptionTextBox.Text.Trim();
+        public string Status =>
+            ((dynamic)statusComboBox.SelectedItem).Value.ToString();
+        public DateTime Deadline => deadlineDateTimePicker.Value;
 
-        public AddDebtForm(IDebtService debtService)
+        public void ShowView() => ShowDialog();
+        public AddDebtForm()
         {
             InitializeComponent();
-            _debtService = debtService;
             InitializeStatusComboBox();
         }
 
@@ -23,9 +29,9 @@ namespace DebtTracker.WUI
         {
             statusComboBox.Items.AddRange(new object[]
             {
-                new { Text = "Не начат", Value = DebtStatus.NotStarted },
-                new { Text = "В процессе", Value = DebtStatus.InProgress },
-                new { Text = "Выполнен", Value = DebtStatus.Completed }
+            new { Text = "Не начат", Value = DebtStatus.NotStarted },
+            new { Text = "В процессе", Value = DebtStatus.InProgress },
+            new { Text = "Выполнен", Value = DebtStatus.Completed }
             });
 
             statusComboBox.DisplayMember = "Text";
@@ -34,82 +40,26 @@ namespace DebtTracker.WUI
         }
 
         private void AddDebtForm_Load(object sender, EventArgs e)
-        {
-            deadlineDateTimePicker.MinDate = DateTime.Today;
-        }
+            => deadlineDateTimePicker.MinDate = DateTime.Today;
 
         private void saveButton_Click(object sender, EventArgs e)
-        {
-            if (!ValidateInputs())
-                return;
-
-            try
-            {
-                var selectedStatus = (DebtStatus)((dynamic)statusComboBox.SelectedItem).Value;
-
-                var newDebt = new Debt
-                {
-                    Subject = subjectTextBox.Text.Trim(),
-                    Description = descriptionTextBox.Text.Trim(),
-                    Status = selectedStatus,
-                    Deadline = deadlineDateTimePicker.Value
-                };
-
-                _debtService.AddDebt(newDebt);
-
-                DebtAdded?.Invoke(this, EventArgs.Empty);
-
-                MessageBox.Show("Долг успешно добавлен!",
-                    "Успех", MessageBoxButtons.OK, MessageBoxIcon.Information);
-
-                this.Close();
-            }
-            catch (DebtValidationException ex)
-            {
-                MessageBox.Show($"Ошибка валидации: {ex.Message}\nПроверьте введенные данные и попробуйте снова.",
-                    "Ошибка валидации", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-            catch (DebtOperationException ex)
-            {
-                MessageBox.Show($"Ошибка при добавлении долга: {ex.Message}",
-                    "Ошибка операции", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Неизвестная ошибка: {ex.Message}\nТип ошибки: {ex.GetType().Name}",
-                    "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-        }
-
-        private bool ValidateInputs()
-        {
-            if (string.IsNullOrWhiteSpace(subjectTextBox.Text))
-            {
-                MessageBox.Show("Название предмета не может быть пустым",
-                    "Ошибка валидации", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                subjectTextBox.Focus();
-                return false;
-            }
-
-            if (deadlineDateTimePicker.Value < DateTime.Today)
-            {
-                MessageBox.Show("Дедлайн не может быть в прошлом",
-                    "Ошибка валидации", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                deadlineDateTimePicker.Focus();
-                return false;
-            }
-
-            return true;
-        }
+            => SaveRequested?.Invoke();
 
         private void cancelButton_Click(object sender, EventArgs e)
+            => CancelRequested?.Invoke();
+
+        public void ShowError(string message)
         {
-            this.Close();
+            MessageBox.Show(message, "Ошибка",
+                MessageBoxButtons.OK, MessageBoxIcon.Error);
         }
+        public void Close() => base.Close();
+
 
         private void panel2_Paint(object sender, PaintEventArgs e)
         {
 
         }
     }
+
 }
