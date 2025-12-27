@@ -5,18 +5,51 @@ using DebtTracker.Entities;
 
 namespace DebtTracker._Shared
 {
+    /// <summary>
+    /// Консольная реализация View в архитектуре MVP.
+    /// Отвечает только за ввод/вывод данных и уведомление Presenter о действиях пользователя.
+    /// </summary>
     public class ConsoleDebtView : IMainDebtView
     {
+        /// <summary>
+        /// Событие, сигнализирующее о необходимости загрузки данных.
+        /// Используется при старте приложения и при обновлении списка долгов.
+        /// </summary>
         public event Action LoadView;
+
+        /// <summary>
+        /// Событие запроса на добавление нового долга.
+        /// </summary>
         public event Action AddRequested;
+
+        /// <summary>
+        /// Событие запроса на редактирование выбранного долга.
+        /// </summary>
         public event Action EditRequested;
+
+        /// <summary>
+        /// Событие запроса на удаление выбранного долга.
+        /// </summary>
         public event Action DeleteRequested;
+
+        /// <summary>
+        /// Событие запроса на обновление списка долгов.
+        /// </summary>
         public event Action RefreshRequested;
 
+        /// <summary>
+        /// Идентификатор долга, выбранного пользователем.
+        /// Устанавливается после ввода ID в консоль.
+        /// </summary>
         public int SelectedDebtId { get; private set; }
 
+        /// <summary>
+        /// Запускает основной цикл консольного интерфейса.
+        /// Отображает меню и генерирует события в зависимости от выбора пользователя.
+        /// </summary>
         public void Run()
         {
+            // Первичная загрузка данных
             LoadView?.Invoke();
 
             bool exit = false;
@@ -37,20 +70,24 @@ namespace DebtTracker._Shared
                 switch (choice)
                 {
                     case "1":
+                        // Запрос на обновление списка долгов
                         LoadView?.Invoke();
                         Pause();
                         break;
 
                     case "2":
+                        // Запрос на добавление долга
                         AddRequested?.Invoke();
                         break;
 
                     case "3":
+                        // Запрос ID и редактирование долга
                         ReadSelectedId();
                         EditRequested?.Invoke();
                         break;
 
                     case "4":
+                        // Запрос ID и удаление долга
                         ReadSelectedId();
                         DeleteRequested?.Invoke();
                         Pause();
@@ -68,6 +105,10 @@ namespace DebtTracker._Shared
             }
         }
 
+        /// <summary>
+        /// Считывает идентификатор долга из консоли
+        /// и сохраняет его в свойство SelectedDebtId.
+        /// </summary>
         private void ReadSelectedId()
         {
             Console.Write("Введите ID долга: ");
@@ -75,6 +116,10 @@ namespace DebtTracker._Shared
             SelectedDebtId = id;
         }
 
+        /// <summary>
+        /// Отображает список долгов в табличном виде в консоли.
+        /// </summary>
+        /// <param name="debts">Коллекция DTO долгов, полученная от Presenter.</param>
         public void ShowDebts(IEnumerable<DebtDto> debts)
         {
             Console.Clear();
@@ -95,21 +140,17 @@ namespace DebtTracker._Shared
             Console.WriteLine($"\nВсего долгов: {list.Count}");
         }
 
-
-
-        public void ShowAddDebt()
-        {
-            Console.WriteLine("Добавление долга (реализуешь позже)");
-        }
-
-        public void ShowEditDebt(int debtId)
-        {
-            Console.WriteLine($"Редактирование долга ID={debtId}");
-        }
-
+        /// <summary>
+        /// Отображает информационное сообщение пользователю.
+        /// </summary>
+        /// <param name="message">Текст сообщения.</param>
         public void ShowMessage(string message)
             => Console.WriteLine(message);
 
+        /// <summary>
+        /// Отображает сообщение об ошибке красным цветом.
+        /// </summary>
+        /// <param name="message">Текст ошибки.</param>
         public void ShowError(string message)
         {
             Console.ForegroundColor = ConsoleColor.Red;
@@ -117,11 +158,14 @@ namespace DebtTracker._Shared
             Console.ResetColor();
         }
 
+        /// <summary>
+        /// Ставит выполнение на паузу до нажатия любой клавиши.
+        /// Используется для удобства пользователя.
+        /// </summary>
         private void Pause()
         {
             Console.WriteLine("\nНажмите любую клавишу...");
             Console.ReadKey();
         }
     }
-
 }

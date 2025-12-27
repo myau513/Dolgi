@@ -44,7 +44,6 @@
     <Compile Include="ConsoleDebtView.cs" />
     <Compile Include="DebtDto.cs" />
     <Compile Include="IAddDebtView.cs" />
-    <Compile Include="IDebtView.cs" />
     <Compile Include="IEditDebtView.cs" />
     <Compile Include="IMainDebtView.cs" />
     <Compile Include="IView.cs" />

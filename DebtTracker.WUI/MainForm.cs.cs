@@ -26,6 +26,10 @@ namespace DebtTracker.WUI
         public MainForm()
         {
             InitializeComponent();
+            addButton.Click += addButton_Click;
+            editButton.Click += editButton_Click;
+            deleteButton.Click += deleteButton_Click;
+            refreshButton.Click += refreshButton_Click;
         }
 
         private void MainForm_Load(object sender, EventArgs e)
@@ -75,6 +79,16 @@ namespace DebtTracker.WUI
 
         private void refreshButton_Click(object sender, EventArgs e)
             => RefreshRequested?.Invoke();
+
+        private void panel1_Paint(object sender, PaintEventArgs e)
+        {
+
+        }
+
+        private void debtsDataGridView_CellContentClick(object sender, DataGridViewCellEventArgs e)
+        {
+
+        }
     }
 
 }

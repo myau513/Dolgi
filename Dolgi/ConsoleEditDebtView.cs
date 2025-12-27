@@ -40,7 +40,6 @@ namespace DebtTracker.ConsoleApp
 
         public void ShowView()
         {
-            // для консоли не нужен — логика запускается через Fill
         }
 
         public void ShowError(string message)
@@ -55,10 +54,6 @@ namespace DebtTracker.ConsoleApp
             Console.WriteLine("\nГотово. Нажмите любую клавишу...");
             Console.ReadKey();
         }
-
-        // ==========================
-        // helpers
-        // ==========================
 
         private string ReadWithDefault(string label, string current)
         {

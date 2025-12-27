@@ -96,7 +96,7 @@ namespace DebtTracker.WUI
             // cancelButton
             // 
             cancelButton.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
-            cancelButton.Location = new Point(230, 220);
+            cancelButton.Location = new Point(326, 220);
             cancelButton.Margin = new Padding(4, 3, 4, 3);
             cancelButton.Name = "cancelButton";
             cancelButton.Size = new Size(100, 30);
@@ -108,7 +108,7 @@ namespace DebtTracker.WUI
             // saveButton
             // 
             saveButton.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
-            saveButton.Location = new Point(340, 220);
+            saveButton.Location = new Point(201, 220);
             saveButton.Margin = new Padding(4, 3, 4, 3);
             saveButton.Name = "saveButton";
             saveButton.Size = new Size(100, 30);

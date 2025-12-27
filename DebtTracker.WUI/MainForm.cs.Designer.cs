@@ -46,6 +46,7 @@
             debtsDataGridView.RowHeadersWidth = 51;
             debtsDataGridView.Size = new Size(788, 394);
             debtsDataGridView.TabIndex = 0;
+            debtsDataGridView.CellContentClick += debtsDataGridView_CellContentClick;
             // 
             // panel1
             // 
@@ -60,6 +61,7 @@
             panel1.Name = "panel1";
             panel1.Size = new Size(788, 75);
             panel1.TabIndex = 1;
+            panel1.Paint += panel1_Paint;
             // 
             // titleLabel
             // 

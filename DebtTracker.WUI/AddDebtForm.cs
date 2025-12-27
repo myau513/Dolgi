@@ -43,7 +43,11 @@ namespace DebtTracker.WUI
             => deadlineDateTimePicker.MinDate = DateTime.Today;
 
         private void saveButton_Click(object sender, EventArgs e)
-            => SaveRequested?.Invoke();
+        {
+            MessageBox.Show("SAVE click дошёл до AddDebtForm");
+            SaveRequested?.Invoke();
+        }
+
 
         private void cancelButton_Click(object sender, EventArgs e)
             => CancelRequested?.Invoke();

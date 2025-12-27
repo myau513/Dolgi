@@ -14,7 +14,7 @@ namespace DebtTracker._Shared
         event Action DeleteRequested;
         event Action RefreshRequested;
 
-        int SelectedDebtId { get; }
+        int SelectedDebtId { get; } 
 
         void ShowDebts(IEnumerable<DebtDto> debts);
         void ShowMessage(string message);

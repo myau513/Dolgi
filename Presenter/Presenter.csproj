@@ -42,7 +42,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AddDebtPresenter.cs" />
-    <Compile Include="DebtPresenter.cs" />
     <Compile Include="EditDebtPresenter.cs" />
     <Compile Include="MainDebtPresenter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
