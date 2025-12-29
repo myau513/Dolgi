@@ -1,5 +1,4 @@
-﻿using DebtTracker._Shared;
-using DebtTracker.Entities;
+﻿using DebtTracker.Entities;
 using System;
 using System.Collections.Generic;
 

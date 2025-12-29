@@ -1,6 +1,13 @@
-﻿using DebtTracker.BusinessLogic;                               
-using DebtTracker.Presentation.Contracts;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using DebtTracker.BusinessLogic;
+using DebtTracker.ConsoleApp;
 using DebtTracker.Dto;
+using DebtTracker.Presentation.Contracts;
+using DebtTracker.WUI;
 
 namespace DebtTracker.Presenter
 {

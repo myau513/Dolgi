@@ -1,8 +1,6 @@
 using DebtTracker.BusinessLogic;
 using DebtTracker.DataAccessLayer;
-using DebtTracker.Presenter;
 using Ninject;
-using Presenter;
 using System;
 using System.Data.Entity;
 using System.Windows.Forms;

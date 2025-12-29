@@ -4,11 +4,11 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{37D33F95-5E9D-4E79-987E-5BB02A993337}</ProjectGuid>
+    <ProjectGuid>{401D98DA-4780-4210-8834-5C0B878E9470}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Presenter</RootNamespace>
-    <AssemblyName>Presenter</AssemblyName>
+    <RootNamespace>DebtTracker.Dto</RootNamespace>
+    <AssemblyName>DebtTracker.Dto</AssemblyName>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
@@ -41,28 +41,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AddDebtPresenter.cs" />
-    <Compile Include="EditDebtPresenter.cs" />
-    <Compile Include="MainDebtPresenter.cs" />
+    <Compile Include="DebtDto.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\DebtTracker.BusinessLogic\DebtTracker.BusinessLogic.csproj">
-      <Project>{8d950025-56e6-4eea-a8d9-2e315a2a6c5d}</Project>
-      <Name>DebtTracker.BusinessLogic</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\DebtTracker.Dto\DebtTracker.Dto.csproj">
-      <Project>{401d98da-4780-4210-8834-5c0b878e9470}</Project>
-      <Name>DebtTracker.Dto</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\DebtTracker.Entities\DebtTracker.Entities.csproj">
-      <Project>{0b18a819-e6e5-47a1-8cdb-b0f8b598b571}</Project>
-      <Name>DebtTracker.Entities</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\DebtTracker.Presentation.Contracts\DebtTracker.Presentation.Contracts.csproj">
-      <Project>{05d7b6f5-4c75-42d7-ba41-0d436db9618a}</Project>
-      <Name>DebtTracker.Presentation.Contracts</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

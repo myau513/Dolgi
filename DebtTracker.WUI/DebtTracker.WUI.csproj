@@ -16,8 +16,9 @@
   <ItemGroup>
     <ProjectReference Include="..\DebtTracker.BusinessLogic\DebtTracker.BusinessLogic.csproj" />
     <ProjectReference Include="..\DebtTracker.DataAccessLayer\DebtTracker.DataAccessLayer.csproj" />
+    <ProjectReference Include="..\DebtTracker.Dto\DebtTracker.Dto.csproj" />
     <ProjectReference Include="..\DebtTracker.Entities\DebtTracker.Entities.csproj" />
-    <ProjectReference Include="..\Presenter\Presenter.csproj" />
+    <ProjectReference Include="..\DebtTracker.Presentation.Contracts\DebtTracker.Presentation.Contracts.csproj" />
   </ItemGroup>
 
 </Project>

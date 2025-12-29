@@ -1,9 +1,8 @@
-﻿using DebtTracker._Shared;
+﻿using DebtTracker.Dto;
+using DebtTracker.Presentation.Contracts;
 using DebtTracker.BusinessLogic;
-using DebtTracker.DataAccessLayer;
 using DebtTracker.Presenter;
 using Ninject;
-using Presenter;
 
 namespace DebtTracker.ConsoleApp
 {

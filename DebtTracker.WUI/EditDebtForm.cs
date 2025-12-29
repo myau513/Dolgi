@@ -1,27 +1,53 @@
-﻿using DebtTracker._Shared;
-using DebtTracker.Entities;
-using System;
+﻿using System;
 using System.Windows.Forms;
+using DebtTracker.Dto;
+using DebtTracker.Presentation.Contracts;
 
 namespace DebtTracker.WUI
 {
     public partial class EditDebtForm : Form, IEditDebtView
     {
+        public event Action LoadView;
         public event Action SaveRequested;
         public event Action CancelRequested;
 
         public int DebtId { get; }
 
-        public string Subject => subjectTextBox.Text.Trim();
-        public string Description => descriptionTextBox.Text.Trim();
-        public string Status => statusComboBox.SelectedItem?.ToString();
-        public DateTime Deadline => deadlineDateTimePicker.Value;
+        public string Subject
+        {
+            get => subjectTextBox.Text.Trim();
+            set => subjectTextBox.Text = value ?? string.Empty;
+        }
+
+        public string Description
+        {
+            get => descriptionTextBox.Text.Trim();
+            set => descriptionTextBox.Text = value ?? string.Empty;
+        }
+
+        public string Status
+        {
+            get => statusComboBox.SelectedItem?.ToString();
+            set => statusComboBox.SelectedItem = value;
+        }
+
+        public DateTime Deadline
+        {
+            get => deadlineDateTimePicker.Value;
+            set => deadlineDateTimePicker.Value = value;
+        }
 
         public EditDebtForm(int debtId)
         {
             InitializeComponent();
             DebtId = debtId;
             InitializeStatusComboBox();
+            this.Load += EditDebtForm_Load;
+        }
+
+        private void EditDebtForm_Load(object sender, EventArgs e)
+        {
+            LoadView?.Invoke();
         }
 
         private void InitializeStatusComboBox()
@@ -38,24 +64,29 @@ namespace DebtTracker.WUI
 
         public void Fill(DebtDto debt)
         {
-            subjectTextBox.Text = debt.Subject;
-            descriptionTextBox.Text = debt.Description;
-            statusComboBox.SelectedItem = debt.Status;
-            deadlineDateTimePicker.Value = debt.Deadline;
+            Subject = debt.Subject;
+            Description = debt.Description;
+            Status = debt.Status;
+            Deadline = debt.Deadline;
         }
 
-        public void ShowView() => ShowDialog();
+        public new void Show() => ShowDialog();
 
-        private void saveButton_Click(object sender, EventArgs e)
-            => SaveRequested?.Invoke();
+        public new void Close() => base.Close();
 
-        private void cancelButton_Click(object sender, EventArgs e)
-            => CancelRequested?.Invoke();
+        public void ShowMessage(string message)
+            => MessageBox.Show(message);
 
         public void ShowError(string message)
         {
             MessageBox.Show(message, "Ошибка",
                 MessageBoxButtons.OK, MessageBoxIcon.Error);
         }
+
+        private void saveButton_Click(object sender, EventArgs e)
+            => SaveRequested?.Invoke();
+
+        private void cancelButton_Click(object sender, EventArgs e)
+            => CancelRequested?.Invoke();
     }
 }

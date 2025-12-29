@@ -1,12 +1,9 @@
-﻿using DebtTracker._Shared;
-using DebtTracker.BusinessLogic;
-using DebtTracker.Entities;
-using Presenter;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Data.Entity.Infrastructure;
 using System.Linq;
 using System.Windows.Forms;
+using DebtTracker.Dto;
+using DebtTracker.Presentation.Contracts;
 
 namespace DebtTracker.WUI
 {
@@ -17,6 +14,7 @@ namespace DebtTracker.WUI
         public event Action EditRequested;
         public event Action DeleteRequested;
         public event Action RefreshRequested;
+        public event Action TomorrowDebtsRequested;
 
         public int SelectedDebtId =>
             debtsDataGridView.SelectedRows.Count == 0
@@ -26,10 +24,12 @@ namespace DebtTracker.WUI
         public MainForm()
         {
             InitializeComponent();
+
             addButton.Click += addButton_Click;
             editButton.Click += editButton_Click;
             deleteButton.Click += deleteButton_Click;
             refreshButton.Click += refreshButton_Click;
+            //tomorrowButton.Click += tomorrowButton_Click; // ← нужна кнопка "на завтра"
         }
 
         private void MainForm_Load(object sender, EventArgs e)
@@ -45,7 +45,8 @@ namespace DebtTracker.WUI
                     Описание = d.Description,
                     Дедлайн = d.Deadline.ToString("yyyy-MM-dd"),
                     Статус = d.Status
-                }).ToList();
+                })
+                .ToList();
         }
 
         public void ShowTomorrowWarning(IEnumerable<DebtDto> debts)
@@ -60,9 +61,8 @@ namespace DebtTracker.WUI
                 MessageBoxButtons.OK, MessageBoxIcon.Warning);
         }
 
-
         public void ShowMessage(string message)
-        => MessageBox.Show(message);
+            => MessageBox.Show(message);
 
         public void ShowError(string message)
             => MessageBox.Show(message, "Ошибка",
@@ -80,15 +80,7 @@ namespace DebtTracker.WUI
         private void refreshButton_Click(object sender, EventArgs e)
             => RefreshRequested?.Invoke();
 
-        private void panel1_Paint(object sender, PaintEventArgs e)
-        {
-
-        }
-
-        private void debtsDataGridView_CellContentClick(object sender, DataGridViewCellEventArgs e)
-        {
-
-        }
+        //private void tomorrowButton_Click(object sender, EventArgs e)
+            //=> TomorrowDebtsRequested?.Invoke();
     }
-
 }

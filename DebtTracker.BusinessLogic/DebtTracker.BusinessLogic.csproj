@@ -73,13 +73,13 @@
       <Project>{1b3c90f9-4773-43b7-98fe-d09d0dd1eafb}</Project>
       <Name>DebtTracker.DataAccessLayer</Name>
     </ProjectReference>
+    <ProjectReference Include="..\DebtTracker.Dto\DebtTracker.Dto.csproj">
+      <Project>{401d98da-4780-4210-8834-5c0b878e9470}</Project>
+      <Name>DebtTracker.Dto</Name>
+    </ProjectReference>
     <ProjectReference Include="..\DebtTracker.Entities\DebtTracker.Entities.csproj">
       <Project>{0b18a819-e6e5-47a1-8cdb-b0f8b598b571}</Project>
       <Name>DebtTracker.Entities</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\DebtTracker._Shared\DebtTracker._Shared.csproj">
-      <Project>{98f485ee-b831-4189-9b12-9d288df5b542}</Project>
-      <Name>DebtTracker._Shared</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

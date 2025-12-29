@@ -1,10 +1,6 @@
-﻿using DebtTracker._Shared;
-using DebtTracker.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System;
+using DebtTracker.Dto;
+using DebtTracker.Presentation.Contracts;
 
 namespace DebtTracker.ConsoleApp
 {
