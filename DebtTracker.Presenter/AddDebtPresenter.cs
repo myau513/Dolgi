@@ -1,13 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using DebtTracker.BusinessLogic;
-using DebtTracker.ConsoleApp;
 using DebtTracker.Dto;
 using DebtTracker.Presentation.Contracts;
-using DebtTracker.WUI;
 
 namespace DebtTracker.Presenter
 {
@@ -18,32 +12,30 @@ namespace DebtTracker.Presenter
 
         public AddDebtPresenter(IAddDebtView view, IDebtModel model)
         {
-            _view = view;
-            _model = model;
+            _view = view ?? throw new ArgumentNullException(nameof(view));
+            _model = model ?? throw new ArgumentNullException(nameof(model));
 
-            _view.SaveRequested += OnSave;
-            _view.CancelRequested += _view.Close;
+            _view.SaveRequested += OnSaveRequested;
+            _view.CancelRequested += OnCancelRequested;
         }
 
-        private void OnSave()
+        private void OnSaveRequested()
         {
-            try
+            var dto = new DebtDto
             {
-                var dto = new DebtDto
-                {
-                    Subject = _view.Subject,
-                    Description = _view.Description,
-                    Status = _view.Status,
-                    Deadline = _view.Deadline
-                };
+                Subject = _view.Subject,
+                Description = _view.Description,
+                Status = _view.Status,
+                Deadline = _view.Deadline
+            };
 
-                _model.AddDebt(dto);
-                _view.Close();
-            }
-            catch (Exception ex)
-            {
-                _view.ShowError(ex.Message);
-            }
+            _model.AddDebt(dto);
+            _view.Close();
+        }
+
+        private void OnCancelRequested()
+        {
+            _view.Close();
         }
     }
 }

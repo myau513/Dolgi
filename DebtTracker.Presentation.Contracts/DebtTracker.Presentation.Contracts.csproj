@@ -42,6 +42,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="IAddDebtView.cs" />
+    <Compile Include="IConsoleMainDebtView.cs" />
     <Compile Include="IEditDebtView.cs" />
     <Compile Include="IMainDebtView.cs" />
     <Compile Include="IView.cs" />

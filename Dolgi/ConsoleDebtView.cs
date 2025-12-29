@@ -1,10 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
 using DebtTracker.Dto;
 using DebtTracker.Presentation.Contracts;
 
 namespace DebtTracker.ConsoleApp
 {
-    public class ConsoleDebtView : IMainDebtView
+    public class ConsoleDebtView : IConsoleMainDebtView
     {
         public event Action LoadView;
         public event Action AddRequested;
@@ -13,50 +14,49 @@ namespace DebtTracker.ConsoleApp
         public event Action RefreshRequested;
         public event Action TomorrowDebtsRequested;
 
-        public int? SelectedDebtId { get; private set; }
+        public int SelectedDebtId { get; private set; }
 
-        public void Run()
+        public void RunLoop()
         {
-            LoadView?.Invoke(); 
+            LoadView?.Invoke();
 
             bool exit = false;
             while (!exit)
             {
-                ConsoleHelper.WriteTitle("Меню");
                 Console.WriteLine("1 - Показать все долги");
                 Console.WriteLine("2 - Добавить долг");
-                Console.WriteLine("3 - Редактировать долг");
-                Console.WriteLine("4 - Удалить долг");
-                Console.WriteLine("5 - Показать долги на завтра");
+                Console.WriteLine("3 - Редактировать");
+                Console.WriteLine("4 - Удалить");
+                Console.WriteLine("5 - Долги на завтра");
                 Console.WriteLine("0 - Выход");
                 Console.Write("Выбор: ");
 
-                var key = Console.ReadLine();
+                var key = Console.ReadKey(true).Key;
 
                 switch (key)
                 {
-                    case "1":
+                    case ConsoleKey.D1:
                         RefreshRequested?.Invoke();
                         break;
-                    case "2":
+                    case ConsoleKey.D2:
                         AddRequested?.Invoke();
                         break;
-                    case "3":
+                    case ConsoleKey.D3:
                         AskSelectedId();
                         EditRequested?.Invoke();
                         break;
-                    case "4":
+                    case ConsoleKey.D4:
                         AskSelectedId();
                         DeleteRequested?.Invoke();
                         break;
-                    case "5":
+                    case ConsoleKey.D5:
                         TomorrowDebtsRequested?.Invoke();
                         break;
-                    case "0":
+                    case ConsoleKey.D0:
                         exit = true;
                         break;
                     default:
-                        ShowError("Неизвестная команда.");
+                        ShowError("Неизвестная команда");
                         break;
                 }
             }
@@ -66,38 +66,41 @@ namespace DebtTracker.ConsoleApp
         {
             Console.Write("Введите Id долга: ");
             if (int.TryParse(Console.ReadLine(), out var id))
-            {
                 SelectedDebtId = id;
-            }
             else
             {
-                SelectedDebtId = null;
-                ShowError("Некорректный Id.");
+                SelectedDebtId = -1;
+                ShowError("Некорректный Id");
             }
         }
 
         public void ShowDebts(IEnumerable<DebtDto> debts)
         {
-            ConsoleHelper.WriteTitle("Список долгов");
-            ConsoleHelper.WriteDebts(debts);
+            foreach (var d in debts)
+            {
+                Console.WriteLine($"[{d.Id}] {d.Subject} | {d.Status} | до {d.Deadline:d}");
+            }
             Console.WriteLine();
         }
 
         public void ShowTomorrowWarning(IEnumerable<DebtDto> debts)
         {
-            ConsoleHelper.WriteTitle("Долги на завтра");
-            ConsoleHelper.WriteDebts(debts);
+            Console.WriteLine("=== Долги на завтра ===");
+            foreach (var d in debts)
+            {
+                Console.WriteLine($"{d.Subject} до {d.Deadline:d}");
+            }
             Console.WriteLine();
         }
 
+        public void ShowMessage(string message)
+            => Console.WriteLine(message);
+
         public void ShowError(string message)
         {
-            ConsoleHelper.WriteError(message);
-        }
-
-        public void ShowInfo(string message)
-        {
-            ConsoleHelper.WriteInfo(message);
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine("[Ошибка] " + message);
+            Console.ResetColor();
         }
     }
 }

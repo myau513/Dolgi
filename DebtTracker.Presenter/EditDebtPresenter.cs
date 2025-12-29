@@ -1,13 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using DebtTracker.BusinessLogic;
-using DebtTracker.ConsoleApp;
 using DebtTracker.Dto;
 using DebtTracker.Presentation.Contracts;
-using DebtTracker.WUI;
 
 namespace DebtTracker.Presenter
 {
@@ -18,50 +12,41 @@ namespace DebtTracker.Presenter
 
         public EditDebtPresenter(IEditDebtView view, IDebtModel model)
         {
-            _view = view;
-            _model = model;
+            _view = view ?? throw new ArgumentNullException(nameof(view));
+            _model = model ?? throw new ArgumentNullException(nameof(model));
 
-            _view.SaveRequested += OnSave;
-            _view.CancelRequested += _view.Close;
-
-            LoadDebt();
-            _view.ShowView();
+            _view.LoadView += OnLoadView;
+            _view.SaveRequested += OnSaveRequested;
+            _view.CancelRequested += OnCancelRequested;
         }
 
-        private void LoadDebt()
+        private void OnLoadView()
         {
-            try
-            {
-                var debt = _model.GetById(_view.DebtId);
-                _view.Fill(debt);
-            }
-            catch (Exception ex)
-            {
-                _view.ShowError(ex.Message);
-                _view.Close();
-            }
+            var dto = _model.GetById(_view.DebtId);
+            _view.Subject = dto.Subject;
+            _view.Description = dto.Description;
+            _view.Status = dto.Status;
+            _view.Deadline = dto.Deadline;
         }
 
-        private void OnSave()
+        private void OnSaveRequested()
         {
-            try
+            var dto = new DebtDto
             {
-                var dto = new DebtDto
-                {
-                    Id = _view.DebtId,
-                    Subject = _view.Subject,
-                    Description = _view.Description,
-                    Status = _view.Status,
-                    Deadline = _view.Deadline
-                };
+                Id = _view.DebtId,
+                Subject = _view.Subject,
+                Description = _view.Description,
+                Status = _view.Status,
+                Deadline = _view.Deadline
+            };
 
-                _model.UpdateDebt(dto);
-                _view.Close();
-            }
-            catch (Exception ex)
-            {
-                _view.ShowError(ex.Message);
-            }
+            _model.UpdateDebt(dto);
+            _view.Close();
+        }
+
+        private void OnCancelRequested()
+        {
+            _view.Close();
         }
     }
 }

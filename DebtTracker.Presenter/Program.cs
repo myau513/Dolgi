@@ -1,9 +1,4 @@
-﻿using DebtTracker.BusinessLogic;
-using DebtTracker.ConsoleApp;
-using DebtTracker.Dto;
-using DebtTracker.Presentation.Contracts;
-using DebtTracker.WUI;
-using Ninject;
+﻿using Ninject;
 using System;
 using System.Text;
 using System.Windows.Forms;

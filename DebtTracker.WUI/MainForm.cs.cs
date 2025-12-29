@@ -29,7 +29,9 @@ namespace DebtTracker.WUI
             editButton.Click += editButton_Click;
             deleteButton.Click += deleteButton_Click;
             refreshButton.Click += refreshButton_Click;
-            //tomorrowButton.Click += tomorrowButton_Click; // ← нужна кнопка "на завтра"
+            tomorrowButton.Click += tomorrowButton_Click;
+
+            this.Load += MainForm_Load;
         }
 
         private void MainForm_Load(object sender, EventArgs e)
@@ -80,7 +82,7 @@ namespace DebtTracker.WUI
         private void refreshButton_Click(object sender, EventArgs e)
             => RefreshRequested?.Invoke();
 
-        //private void tomorrowButton_Click(object sender, EventArgs e)
-            //=> TomorrowDebtsRequested?.Invoke();
+        private void tomorrowButton_Click(object sender, EventArgs e)
+            => TomorrowDebtsRequested?.Invoke();
     }
 }

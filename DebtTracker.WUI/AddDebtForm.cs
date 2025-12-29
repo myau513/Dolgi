@@ -1,4 +1,6 @@
-﻿using DebtTracker.Presentation.Contracts;
+﻿using System;
+using System.Windows.Forms;
+using DebtTracker.Presentation.Contracts;
 
 namespace DebtTracker.WUI
 {
@@ -47,6 +49,9 @@ namespace DebtTracker.WUI
             InitializeComponent();
             InitializeStatusComboBox();
             this.Load += AddDebtForm_Load;
+
+            saveButton.Click += saveButton_Click;
+            cancelButton.Click += cancelButton_Click;
         }
 
         private void AddDebtForm_Load(object sender, EventArgs e)
@@ -70,7 +75,6 @@ namespace DebtTracker.WUI
         }
 
         public new void Show() => ShowDialog();
-
         public new void Close() => base.Close();
 
         public void ShowMessage(string message)

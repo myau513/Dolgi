@@ -8,11 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\DebtTracker.BusinessLogic\DebtTracker.BusinessLogic.csproj" />
-    <ProjectReference Include="..\DebtTracker.Dto\DebtTracker.Dto.csproj" />
-    <ProjectReference Include="..\DebtTracker.Presentation.Contracts\DebtTracker.Presentation.Contracts.csproj" />
-    <ProjectReference Include="..\DebtTracker.WUI\DebtTracker.WUI.csproj" />
-    <ProjectReference Include="..\Dolgi\DebtTracker.ConsoleApp.csproj" />
+    <PackageReference Include="Ninject" Version="3.3.6" />
   </ItemGroup>
 
 </Project>

@@ -37,13 +37,12 @@ namespace DebtTracker.Presentation.Contracts
         /// <summary>
         /// Событие: пользователь запросил долги со сроком "на завтра".
         /// </summary>
-        //event Action TomorrowDebtsRequested;
+        event Action TomorrowDebtsRequested;
 
         /// <summary>
-        /// Id выбранного долга в списке.
-        /// null, если ничего не выбрано.
+        /// Id выбранного долга, -1 если ничего не выбрано.
         /// </summary>
-        int? SelectedDebtId { get; }
+        int SelectedDebtId { get; }
 
         /// <summary>
         /// Показать список долгов на основном экране.

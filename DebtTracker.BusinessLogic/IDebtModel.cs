@@ -1,6 +1,6 @@
-﻿using DebtTracker.Entities;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using DebtTracker.Dto;
 
 namespace DebtTracker.BusinessLogic
 {
@@ -16,6 +16,7 @@ namespace DebtTracker.BusinessLogic
     /// </summary>
     public interface IDebtModel
     {
+        event Action<IEnumerable<DebtDto>> TomorrowDebtsLoaded;
         /// <summary>
         /// Событие, уведомляющее Presenter о том,
         /// что список долгов был загружен или обновлён.
@@ -29,6 +30,7 @@ namespace DebtTracker.BusinessLogic
         /// в процессе выполнения бизнес-операций.
         /// </summary>
         event Action<string> ErrorOccurred;
+        void LoadTomorrowDebts();
 
         /// <summary>
         /// Загружает список долгов (как правило, отсортированный)

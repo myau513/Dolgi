@@ -4,87 +4,90 @@ using DebtTracker.Presentation.Contracts;
 
 namespace DebtTracker.ConsoleApp
 {
+    /// <summary>
+    /// Консольная реализация экрана редактирования долга.
+    /// </summary>
     public class ConsoleEditDebtView : IEditDebtView
     {
+        public event Action LoadView;
         public event Action SaveRequested;
         public event Action CancelRequested;
 
         public int DebtId { get; }
 
-        public string Subject { get; private set; }
-        public string Description { get; private set; }
-        public string Status { get; private set; }
-        public DateTime Deadline { get; private set; }
+        public string Subject { get; set; }
+        public string Description { get; set; }
+        public string Status { get; set; }
+        public DateTime Deadline { get; set; }
 
         public ConsoleEditDebtView(int debtId)
         {
             DebtId = debtId;
         }
 
-        public void Fill(DebtDto debt)
+        /// <summary>
+        /// Презентер перед вызовом Show() уже заполнит
+        /// Subject/Description/Status/Deadline через свойства.
+        /// </summary>
+        public void Show()
         {
             Console.Clear();
-            Console.WriteLine($"=== РЕДАКТИРОВАНИЕ ДОЛГА ID={debt.Id} ===");
+            Console.WriteLine("=== Редактирование долга #{0} ===", DebtId);
+            LoadView?.Invoke(); // если презентер что-то делает на Load
 
-            Subject = ReadWithDefault("Предмет", debt.Subject);
-            Description = ReadWithDefault("Описание", debt.Description);
-            Status = ReadStatus(debt.Status);
-            Deadline = ReadDate(debt.Deadline);
+            Console.WriteLine("Текущий предмет: " + Subject);
+            Console.Write("Новый предмет (Enter — оставить): ");
+            var input = Console.ReadLine();
+            if (!string.IsNullOrWhiteSpace(input))
+                Subject = input;
 
-            SaveRequested?.Invoke();
+            Console.WriteLine("Текущее описание: " + Description);
+            Console.Write("Новое описание (Enter — оставить): ");
+            input = Console.ReadLine();
+            if (!string.IsNullOrWhiteSpace(input))
+                Description = input;
+
+            Console.WriteLine("Текущий статус: " + Status);
+            Console.Write("Новый статус (NotStarted / InProgress / Completed, Enter — оставить): ");
+            input = Console.ReadLine();
+            if (!string.IsNullOrWhiteSpace(input))
+                Status = input;
+
+            Console.WriteLine("Текущий дедлайн: {0:yyyy-MM-dd}", Deadline);
+            Console.Write("Новый дедлайн (гггг-мм-дд, Enter — оставить): ");
+            input = Console.ReadLine();
+            if (!string.IsNullOrWhiteSpace(input) &&
+                DateTime.TryParse(input, out var date))
+            {
+                Deadline = date;
+            }
+
+            Console.Write("Сохранить изменения? (Y/N): ");
+            var key = Console.ReadKey(true).Key;
+            Console.WriteLine();
+
+            if (key == ConsoleKey.Y)
+                SaveRequested?.Invoke();
+            else
+                CancelRequested?.Invoke();
         }
 
-        public void ShowView()
+        public void Close()
         {
+            Console.WriteLine("Нажмите любую клавишу, чтобы продолжить...");
+            Console.ReadKey(true);
+        }
+
+        public void ShowMessage(string message)
+        {
+            Console.WriteLine(message);
         }
 
         public void ShowError(string message)
         {
             Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine(message);
+            Console.WriteLine("[Ошибка] " + message);
             Console.ResetColor();
-        }
-
-        public void Close()
-        {
-            Console.WriteLine("\nГотово. Нажмите любую клавишу...");
-            Console.ReadKey();
-        }
-
-        private string ReadWithDefault(string label, string current)
-        {
-            Console.Write($"{label} ({current}): ");
-            var input = Console.ReadLine();
-            return string.IsNullOrWhiteSpace(input) ? current : input;
-        }
-
-        private string ReadStatus(string current)
-        {
-            Console.WriteLine("Статус:");
-            Console.WriteLine("0 – NotStarted");
-            Console.WriteLine("1 – InProgress");
-            Console.WriteLine("2 – Completed");
-            Console.Write($"Текущий ({current}): ");
-
-            var input = Console.ReadLine();
-
-            return input switch
-            {
-                "0" => DebtStatus.NotStarted.ToString(),
-                "1" => DebtStatus.InProgress.ToString(),
-                "2" => DebtStatus.Completed.ToString(),
-                _ => current
-            };
-        }
-
-        private DateTime ReadDate(DateTime current)
-        {
-            Console.Write($"Дедлайн ({current:yyyy-MM-dd}): ");
-            var input = Console.ReadLine();
-
-            return DateTime.TryParse(input, out var date)
-                ? date
-                : current;
         }
     }
 }

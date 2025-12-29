@@ -43,6 +43,9 @@ namespace DebtTracker.WUI
             DebtId = debtId;
             InitializeStatusComboBox();
             this.Load += EditDebtForm_Load;
+
+            saveButton.Click += saveButton_Click;
+            cancelButton.Click += cancelButton_Click;
         }
 
         private void EditDebtForm_Load(object sender, EventArgs e)
@@ -62,26 +65,15 @@ namespace DebtTracker.WUI
             statusComboBox.SelectedIndex = 0;
         }
 
-        public void Fill(DebtDto debt)
-        {
-            Subject = debt.Subject;
-            Description = debt.Description;
-            Status = debt.Status;
-            Deadline = debt.Deadline;
-        }
-
-        public new void Show() => ShowDialog();
-
-        public new void Close() => base.Close();
-
         public void ShowMessage(string message)
             => MessageBox.Show(message);
 
         public void ShowError(string message)
-        {
-            MessageBox.Show(message, "Ошибка",
+            => MessageBox.Show(message, "Ошибка",
                 MessageBoxButtons.OK, MessageBoxIcon.Error);
-        }
+
+        public new void Show() => ShowDialog();
+        public new void Close() => base.Close();
 
         private void saveButton_Click(object sender, EventArgs e)
             => SaveRequested?.Invoke();
