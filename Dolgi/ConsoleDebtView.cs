@@ -25,6 +25,7 @@ namespace DebtTracker.ConsoleApp
             bool exit = false;
             while (!exit)
             {
+
                 Console.WriteLine();
                 Console.WriteLine("1 - Показать все долги");
                 Console.WriteLine("2 - Добавить долг");

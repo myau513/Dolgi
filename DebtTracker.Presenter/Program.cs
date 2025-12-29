@@ -24,7 +24,7 @@ namespace DebtTracker.Presenter
                 Console.WriteLine("1. Windows Forms");
                 Console.WriteLine("2. Консоль");
                 Console.WriteLine("0. Выход");
-                Console.Write("Выберите: ");
+                Console.Write("Выберите команду\n");
 
                 var key = Console.ReadKey(true).Key;
 
@@ -35,6 +35,7 @@ namespace DebtTracker.Presenter
                         break;
 
                     case ConsoleKey.D2:
+                        Console.Clear();
                         RunConsole();
                         break;
 
