@@ -2,7 +2,11 @@
 using System;
 using System.Text;
 using System.Windows.Forms;
-using static System.Net.Mime.MediaTypeNames;
+using DebtTracker.BusinessLogic;
+using DebtTracker.Dto;
+using DebtTracker.Presentation.Contracts;
+using DebtTracker.WUI;
+using DebtTracker.ConsoleApp;
 
 namespace DebtTracker.Presenter
 {

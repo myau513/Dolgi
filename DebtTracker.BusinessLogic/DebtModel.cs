@@ -23,7 +23,9 @@ namespace DebtTracker.BusinessLogic
         {
             try
             {
-                var debts = _service.GetAllDebts();
+                // Было: _service.GetAllDebts();
+                // В IDebtService есть только GetAllDebtsSorted()
+                var debts = _service.GetAllDebtsSorted();
                 var dtos = debts.Select(MapToDto).ToList();
                 DebtsLoaded?.Invoke(dtos);
             }
@@ -113,7 +115,9 @@ namespace DebtTracker.BusinessLogic
                 Id = dto.Id,
                 Subject = dto.Subject,
                 Description = dto.Description,
-                Status = Enum.Parse<DebtStatus>(dto.Status),
+                // Было: Enum.Parse<DebtStatus>(dto.Status)
+                // Делаем старый вариант через typeof
+                Status = (DebtStatus)Enum.Parse(typeof(DebtStatus), dto.Status),
                 Deadline = dto.Deadline
             };
         }

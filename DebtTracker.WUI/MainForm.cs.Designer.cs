@@ -10,6 +10,8 @@
         private System.Windows.Forms.Button refreshButton;
         private System.Windows.Forms.Panel panel1;
         private System.Windows.Forms.Label titleLabel;
+        private System.Windows.Forms.Button tomorrowButton;
+
 
         protected override void Dispose(bool disposing)
         {
@@ -29,6 +31,7 @@
             editButton = new Button();
             deleteButton = new Button();
             refreshButton = new Button();
+            tomorrowButton = new Button();
             ((System.ComponentModel.ISupportInitialize)debtsDataGridView).BeginInit();
             panel1.SuspendLayout();
             SuspendLayout();
@@ -46,7 +49,6 @@
             debtsDataGridView.RowHeadersWidth = 51;
             debtsDataGridView.Size = new Size(788, 394);
             debtsDataGridView.TabIndex = 0;
-            debtsDataGridView.CellContentClick += debtsDataGridView_CellContentClick;
             // 
             // panel1
             // 
@@ -61,7 +63,7 @@
             panel1.Name = "panel1";
             panel1.Size = new Size(788, 75);
             panel1.TabIndex = 1;
-            panel1.Paint += panel1_Paint;
+            panel1.Controls.Add(tomorrowButton);
             // 
             // titleLabel
             // 
@@ -117,6 +119,17 @@
             refreshButton.TabIndex = 3;
             refreshButton.Text = "Обновить";
             refreshButton.UseVisualStyleBackColor = true;
+            //
+            // tomorrowButton
+            // 
+            tomorrowButton.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            tomorrowButton.Location = new Point(709, 19);
+            tomorrowButton.Margin = new Padding(4);
+            tomorrowButton.Name = "tomorrowButton";
+            tomorrowButton.Size = new Size(70, 38);
+            tomorrowButton.TabIndex = 4;
+            tomorrowButton.Text = "На завтра";
+            tomorrowButton.UseVisualStyleBackColor = true;
             // 
             // MainForm
             // 

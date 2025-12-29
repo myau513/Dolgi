@@ -1,14 +1,23 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <OutputType>Exe</OutputType>
-    <TargetFramework>net8.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
-  </PropertyGroup>
+	<PropertyGroup>
+		<OutputType>Exe</OutputType>
+		<TargetFramework>net8.0-windows</TargetFramework>
+		<UseWindowsForms>true</UseWindowsForms>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Ninject" Version="3.3.6" />
-  </ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="Ninject" Version="3.3.6" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\DebtTracker.BusinessLogic\DebtTracker.BusinessLogic.csproj" />
+		<ProjectReference Include="..\DebtTracker.Dto\DebtTracker.Dto.csproj" />
+		<ProjectReference Include="..\DebtTracker.Presentation.Contracts\DebtTracker.Presentation.Contracts.csproj" />
+		<ProjectReference Include="..\DebtTracker.WUI\DebtTracker.WUI.csproj" />
+		<ProjectReference Include="..\Dolgi\DebtTracker.ConsoleApp.csproj" />
+	</ItemGroup>
 
 </Project>
