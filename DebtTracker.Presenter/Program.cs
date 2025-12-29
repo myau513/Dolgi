@@ -19,7 +19,6 @@ namespace DebtTracker.Presenter
 
             while (true)
             {
-                Console.Clear();
                 Console.WriteLine("=== ВЫБОР ИНТЕРФЕЙСА ===");
                 Console.WriteLine("1. Windows Forms");
                 Console.WriteLine("2. Консоль");
@@ -47,8 +46,6 @@ namespace DebtTracker.Presenter
 
         private static void RunWinForms()
         {
-            Application.EnableVisualStyles();
-            Application.SetCompatibleTextRenderingDefault(false);
 
             var kernel = new StandardKernel(new SimpleConfigModule());
             var model = kernel.Get<IDebtModel>();
@@ -58,7 +55,7 @@ namespace DebtTracker.Presenter
 
             var presenter = new MainDebtPresenter(view, model, factory);
 
-            presenter.Run(); // всё остальное – внутри презентера
+            presenter.Run();
         }
 
         private static void RunConsole()
@@ -67,11 +64,11 @@ namespace DebtTracker.Presenter
             var model = kernel.Get<IDebtModel>();
 
             IConsoleMainDebtView view = new ConsoleDebtView();
-            IViewFactory factory = new ConsoleViewFactory(); // если есть отдельные формы для add/edit
+            IViewFactory factory = new ConsoleViewFactory(); 
 
             var presenter = new MainDebtPresenter(view, model, factory);
 
-            presenter.Run(); // презентер решает, как запускаться
+            presenter.Run(); 
         }
     }
 }

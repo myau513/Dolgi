@@ -51,7 +51,7 @@ namespace DebtTracker.DataAccessLayer
             try
             {
                 _context.Set<T>().Add(item);
-                _context.SaveChanges(); // Немедленное сохранение изменений в БД
+                _context.SaveChanges();
             }
             catch (DbUpdateException dbEx) when (IsUniqueConstraintViolation(dbEx))
             {
@@ -136,14 +136,12 @@ namespace DebtTracker.DataAccessLayer
 
             try
             {
-                // Безопасный способ обновления для EF: находим существующую сущность
                 var existing = _context.Set<T>().Find(item.Id);
                 if (existing == null)
                     throw new EntityNotFoundException($"Запись с ID {item.Id} не найдена для обновления");
 
-                // Обновляем значения существующей сущности
                 _context.Entry(existing).CurrentValues.SetValues(item);
-                _context.SaveChanges(); // Немедленное сохранение изменений в БД
+                _context.SaveChanges(); 
             }
             catch (DbUpdateException dbEx) when (IsUniqueConstraintViolation(dbEx))
             {
@@ -182,7 +180,7 @@ namespace DebtTracker.DataAccessLayer
                 if (entity != null)
                 {
                     _context.Set<T>().Remove(entity);
-                    _context.SaveChanges(); // Немедленное сохранение изменений в БД
+                    _context.SaveChanges(); 
                 }
             }
             catch (DbUpdateException dbEx) when (IsForeignKeyConstraintViolation(dbEx))
@@ -224,7 +222,7 @@ namespace DebtTracker.DataAccessLayer
         private bool IsForeignKeyConstraintViolation(DbUpdateException ex)
         {
             var sqlException = ex.GetBaseException() as System.Data.SqlClient.SqlException;
-            return sqlException?.Number == 547; // Нарушение FOREIGN KEY constraint
+            return sqlException?.Number == 547; 
         }
     }
 }

@@ -15,7 +15,7 @@ namespace DebtTracker.Presentation.Contracts
     {
         /// <summary>
         /// Событие, сигнализирующее о том, что представление загружено
-        /// и готово к работе (например, форма отрисована).
+        /// и готово к работе
         /// </summary>
         event Action LoadView;
 

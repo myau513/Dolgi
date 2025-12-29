@@ -14,18 +14,15 @@ namespace DebtTracker.BusinessLogic
     {
         public override void Load()
         {
-            // DbContext — transient (ПРАВИЛЬНО)
             Bind<DebtContext>().ToSelf().InTransientScope();
             Bind<DbContext>()
                 .ToMethod(ctx => ctx.Kernel.Get<DebtContext>())
                 .InTransientScope();
 
-            // Репозиторий — transient
             Bind<IRepository<Debt>>()
                 .To<EntityFrameworkRepository<Debt>>()
                 .InTransientScope();
 
-            // Бизнес-логика
             Bind<IDebtService>()
                 .To<DebtService>()
                 .InTransientScope();

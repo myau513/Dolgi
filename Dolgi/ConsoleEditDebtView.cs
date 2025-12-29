@@ -5,35 +5,63 @@ using DebtTracker.Presentation.Contracts;
 namespace DebtTracker.ConsoleApp
 {
     /// <summary>
-    /// Консольная реализация экрана редактирования долга.
+    /// Консольная реализация экрана редактирования существующего долга.
+    /// Является View в архитектуре MVP: показывает данные и
+    /// генерирует события, на которые реагирует Presenter.
     /// </summary>
     public class ConsoleEditDebtView : IEditDebtView
     {
+        /// <summary>
+        /// Событие: экран загрузился и готов к работе.
+        /// Presenter может использовать его для инициализации данных.
+        /// </summary>
         public event Action LoadView;
+
+        /// <summary>
+        /// Событие: пользователь подтвердил сохранение изменений.
+        /// </summary>
         public event Action SaveRequested;
+
+        /// <summary>
+        /// Событие: пользователь отменил редактирование.
+        /// </summary>
         public event Action CancelRequested;
 
+        /// <summary>
+        /// Id редактируемого долга.
+        /// Передается в конструктор и используется Presenter'ом.
+        /// </summary>
         public int DebtId { get; }
 
+        /// <summary>
+        /// Поля редактируемого долга.
+        /// Presenter заполняет их перед вызовом Show().
+        /// </summary>
         public string Subject { get; set; }
         public string Description { get; set; }
         public string Status { get; set; }
         public DateTime Deadline { get; set; }
 
+        /// <summary>
+        /// Создает экран редактирования для конкретного долга.
+        /// </summary>
+        /// <param name="debtId">Id долга, который нужно редактировать.</param>
         public ConsoleEditDebtView(int debtId)
         {
             DebtId = debtId;
         }
 
         /// <summary>
-        /// Презентер перед вызовом Show() уже заполнит
-        /// Subject/Description/Status/Deadline через свойства.
+        /// Отображает форму редактирования в консоли,
+        /// позволяет пользователю изменить данные
+        /// и поднимает события SaveRequested / CancelRequested.
         /// </summary>
         public void Show()
         {
             Console.Clear();
             Console.WriteLine("=== Редактирование долга #{0} ===", DebtId);
-            LoadView?.Invoke(); // если презентер что-то делает на Load
+
+            LoadView?.Invoke();
 
             Console.WriteLine("Текущий предмет: " + Subject);
             Console.Write("Новый предмет (Enter — оставить): ");
@@ -72,17 +100,28 @@ namespace DebtTracker.ConsoleApp
                 CancelRequested?.Invoke();
         }
 
+        /// <summary>
+        /// Закрывает экран редактирования (в консоли — просто ожидание клавиши).
+        /// </summary>
         public void Close()
         {
             Console.WriteLine("Нажмите любую клавишу, чтобы продолжить...");
             Console.ReadKey(true);
         }
 
+        /// <summary>
+        /// Выводит обычное информационное сообщение.
+        /// </summary>
+        /// <param name="message">Текст сообщения.</param>
         public void ShowMessage(string message)
         {
             Console.WriteLine(message);
         }
 
+        /// <summary>
+        /// Выводит сообщение об ошибке красным цветом.
+        /// </summary>
+        /// <param name="message">Текст ошибки.</param>
         public void ShowError(string message)
         {
             Console.ForegroundColor = ConsoleColor.Red;

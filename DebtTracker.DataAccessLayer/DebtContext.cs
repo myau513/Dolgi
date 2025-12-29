@@ -33,8 +33,6 @@ namespace DebtTracker.DataAccessLayer
         /// </remarks>
         public DebtContext() : base("name=DebtDbConnection")
         {
-            // Отключаем автоматические миграции и Code First инициализацию
-            // Это предотвращает автоматическое создание/изменение схемы БД
             Database.SetInitializer<DebtContext>(null);
         }
 

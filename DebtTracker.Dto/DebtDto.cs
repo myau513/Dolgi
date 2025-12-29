@@ -13,9 +13,9 @@ namespace DebtTracker.Dto
     public class DebtDto
     {
         public int Id { get; set; }
-        public string Subject { get; set; }      // тема / предмет
-        public string Description { get; set; }  // описание
-        public string Status { get; set; }       // "NotStarted" / "InProgress" / "Completed"
+        public string Subject { get; set; }      
+        public string Description { get; set; }  
+        public string Status { get; set; }       
         public System.DateTime Deadline { get; set; }
     }
 }
