@@ -21,7 +21,7 @@ namespace DebtTracker.ConsoleApp
         {
             Console.Clear();
             Console.WriteLine("=== Добавление долга ===");
-            LoadView?.Invoke(); // если презентер что-то хочет сделать на старте
+            LoadView?.Invoke(); // если презентеру что-то нужно
 
             Console.Write("Предмет: ");
             Subject = Console.ReadLine();
@@ -33,24 +33,43 @@ namespace DebtTracker.ConsoleApp
             Status = Console.ReadLine();
 
             Console.Write("Дедлайн (гггг-мм-дд): ");
-            if (DateTime.TryParse(Console.ReadLine(), out var date))
-                Deadline = date;
-            else
-                Deadline = DateTime.Today;
+            var dateInput = Console.ReadLine();
+
+            // Валидация даты
+            if (!DateTime.TryParse(dateInput, out var date))
+            {
+                ShowError("Некорректная дата. Долг не сохранён. Проверьте введённые данные и повторите ещё раз.");
+                CancelRequested?.Invoke();
+                return;
+            }
+            Deadline = date;
+
+            // (опционально) валидация статуса
+            var allowedStatuses = new[] { "NotStarted", "InProgress", "Completed" };
+            if (!allowedStatuses.Contains(Status))
+            {
+                ShowError("Некорректный статус. Используйте: NotStarted / InProgress / Completed.\nДолг не сохранён, повторите ещё раз.");
+                CancelRequested?.Invoke();
+                return;
+            }
 
             Console.Write("Сохранить? (Y/N): ");
             var key = Console.ReadKey(true).Key;
             Console.WriteLine();
 
             if (key == ConsoleKey.Y)
+            {
                 SaveRequested?.Invoke();
+            }
             else
+            {
+                ShowMessage("Долг не сохранён. Проверьте введённые данные и повторите ещё раз.");
                 CancelRequested?.Invoke();
+            }
         }
 
         public void Close()
         {
-            // для консоли можно просто ничего не делать
             Console.WriteLine("Нажмите любую клавишу для продолжения...");
             Console.ReadKey(true);
         }

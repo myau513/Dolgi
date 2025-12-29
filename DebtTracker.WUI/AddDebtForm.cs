@@ -50,8 +50,6 @@ namespace DebtTracker.WUI
             InitializeStatusComboBox();
             this.Load += AddDebtForm_Load;
 
-            saveButton.Click += saveButton_Click;
-            cancelButton.Click += cancelButton_Click;
         }
 
         private void AddDebtForm_Load(object sender, EventArgs e)
@@ -102,6 +100,11 @@ namespace DebtTracker.WUI
             }
 
             public override string ToString() => Text;
+        }
+
+        private void panel2_Paint(object sender, PaintEventArgs e)
+        {
+
         }
     }
 }

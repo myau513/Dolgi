@@ -91,6 +91,7 @@ namespace DebtTracker.WUI
             panel2.Padding = new Padding(20);
             panel2.Size = new Size(450, 290);
             panel2.TabIndex = 1;
+            panel2.Paint += panel2_Paint;
             // 
             // cancelButton
             // 

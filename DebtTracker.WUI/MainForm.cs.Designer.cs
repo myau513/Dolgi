@@ -57,13 +57,14 @@
             panel1.Controls.Add(editButton);
             panel1.Controls.Add(deleteButton);
             panel1.Controls.Add(refreshButton);
+            panel1.Controls.Add(tomorrowButton);
             panel1.Dock = DockStyle.Top;
             panel1.Location = new Point(0, 0);
             panel1.Margin = new Padding(4);
             panel1.Name = "panel1";
             panel1.Size = new Size(788, 75);
             panel1.TabIndex = 1;
-            panel1.Controls.Add(tomorrowButton);
+            panel1.Paint += panel1_Paint;
             // 
             // titleLabel
             // 
@@ -119,7 +120,7 @@
             refreshButton.TabIndex = 3;
             refreshButton.Text = "Обновить";
             refreshButton.UseVisualStyleBackColor = true;
-            //
+            // 
             // tomorrowButton
             // 
             tomorrowButton.Anchor = AnchorStyles.Top | AnchorStyles.Right;

@@ -52,6 +52,7 @@ namespace DebtTracker.Presenter
         private void OnLoadView()
         {
             _model.LoadDebts();
+            _model.LoadTomorrowDebts();
         }
 
         private void OnRefreshRequested()

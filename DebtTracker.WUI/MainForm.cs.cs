@@ -30,8 +30,6 @@ namespace DebtTracker.WUI
             deleteButton.Click += deleteButton_Click;
             refreshButton.Click += refreshButton_Click;
             tomorrowButton.Click += tomorrowButton_Click;
-
-            this.Load += MainForm_Load;
         }
 
         private void MainForm_Load(object sender, EventArgs e)
@@ -84,5 +82,10 @@ namespace DebtTracker.WUI
 
         private void tomorrowButton_Click(object sender, EventArgs e)
             => TomorrowDebtsRequested?.Invoke();
+
+        private void panel1_Paint(object sender, PaintEventArgs e)
+        {
+
+        }
     }
 }

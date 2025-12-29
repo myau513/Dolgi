@@ -80,5 +80,10 @@ namespace DebtTracker.WUI
 
         private void cancelButton_Click(object sender, EventArgs e)
             => CancelRequested?.Invoke();
+
+        private void panel2_Paint(object sender, PaintEventArgs e)
+        {
+
+        }
     }
 }
